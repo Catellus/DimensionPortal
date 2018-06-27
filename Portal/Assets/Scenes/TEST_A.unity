@@ -615,7 +615,7 @@ MonoBehaviour:
     throughPlatform: 0
     facingDirection: 0
     inA: 0
-  wallMask:
+  throughPortalCollision:
     serializedVersion: 2
     m_Bits: 0
   maxWalkSpeed: 6
@@ -701,7 +701,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1267152330}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.69, y: 1.508, z: -0.0001}
+  m_LocalPosition: {x: 2.01, y: 1.11, z: -0.0001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -857,7 +857,7 @@ GameObject:
   m_Layer: 30
   m_Name: Portal
   m_TagString: Portal
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 419385456094870383, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -886,7 +886,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1983922522}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.86, y: 1.5, z: 0}
+  m_LocalPosition: {x: 3.27, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1563553909}
@@ -917,5 +917,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.05, y: 2}
+  m_Size: {x: 0.15, y: 2}
   m_EdgeRadius: 0

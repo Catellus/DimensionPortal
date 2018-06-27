@@ -64,12 +64,13 @@ public class RayManager : MonoBehaviour
 
     public tmp_Portal portal;
 
-    public Vector3 GetPortalPassDistance(Vector3 _location){ return GetPortalPassDistance(_location, Vector3.zero); }
-    public Vector3 GetPortalPassDistance(Vector3 _location, Vector3 _portalOffset)
-    {
-        Vector3 playerOffset = _location - (portal.transform.position + _portalOffset);
-        Vector3 pointOnPlane = Vector3.ProjectOnPlane(playerOffset, portal.transform.up);
-        return pointOnPlane;
-    }
+    Vector2 b;
+    Vector2 a;
 
+    public float GetPortalPassDistance(Vector3 _location)
+    {
+        Vector3 playerOffset = _location - portal.transform.position;
+        Vector3 pointOnPlane = Vector3.ProjectOnPlane(playerOffset, portal.transform.up);
+        return (((pointOnPlane.x - Vector2.zero.x)) / (portal.transform.right.x));
+    }
 }

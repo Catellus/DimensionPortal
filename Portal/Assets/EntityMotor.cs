@@ -22,7 +22,7 @@ public class EntityMotor : RayManager
 
     float distanceToPortalCenter;
     float entitySideOfPortal;
-    public LayerMask throughPortalCollision;
+    LayerMask throughPortalCollision;
 
     #endregion
 
@@ -41,7 +41,7 @@ public class EntityMotor : RayManager
         cinfo.Reset();
 
         throughPortalCollision = collisionMask;
-        distanceToPortalCenter = (this.transform.position - portal.transform.position).magnitude;
+        distanceToPortalCenter = ((Vector2)this.transform.position - (Vector2)portal.transform.position).magnitude;
 
         entitySideOfPortal = (int)Mathf.Sign(GetPortalPassDistance(this.transform.position));
 
@@ -77,14 +77,14 @@ public class EntityMotor : RayManager
         for (int i = 0; i < sideRayCount; i++)
         {
             Vector2 origin = (dir == -1) ? rayOrigins.bottomLeft : rayOrigins.bottomRight;
-            origin += Vector2.up * (sideRaySpacing * i);
+            origin += (Vector2) (this.transform.rotation * (Vector2.up * (sideRaySpacing * i)));
 
             if (distanceToPortalCenter <= portal.switchDistance)
                 GetTraceThroughPortal(ref throughPortalCollision, origin);
 
-            RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.right * dir, rayLength, throughPortalCollision);
+            RaycastHit2D hit = Physics2D.Raycast(origin, this.transform.rotation * (Vector2.right * dir), rayLength, throughPortalCollision);
 
-            Debug.DrawRay(origin, Vector2.right * dir, Color.blue);
+            Debug.DrawRay(origin, this.transform.rotation * (Vector2.right * dir), Color.blue);
 
             if (hit)
             {
@@ -92,7 +92,7 @@ public class EntityMotor : RayManager
                 {
                     LayerMask throughMask = 0;
                     throughMask |= 1 << (cinfo.inA ? 10 : 9);
-                    RaycastHit2D throughHit = Physics2D.Raycast(hit.point, Vector2.right * dir, rayLength - hit.distance, throughMask);
+                    RaycastHit2D throughHit = Physics2D.Raycast(hit.point, this.transform.rotation * (Vector2.right * dir), rayLength - hit.distance, throughMask);
 
                     if (throughHit)
                     {
@@ -126,25 +126,28 @@ public class EntityMotor : RayManager
         for (int i = 0; i < capRayCount; i++)
         {
             Vector2 origin = (dir == -1) ? rayOrigins.bottomLeft : rayOrigins.topLeft;
-            origin += Vector2.right * (capRaySpacing * i + _ammount.x);
+            origin += (Vector2)(this.transform.rotation * (Vector2.right * (capRaySpacing * i + _ammount.x)));
 
             if (distanceToPortalCenter <= portal.switchDistance)
                 GetTraceThroughPortal(ref throughPortalCollision, origin);
 
-            RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.up * dir, rayLength, throughPortalCollision);
+            RaycastHit2D hit = Physics2D.Raycast(origin, this.transform.rotation * (Vector2.up * dir), rayLength, throughPortalCollision);
 
-            Debug.DrawRay(origin, Vector2.up * dir, Color.red);
+            Debug.DrawRay(origin, this.transform.rotation * (Vector2.up * dir), Color.red);
 
             if (hit)
             {
                 if (hit.collider.tag == "Permeable")
-                    HandlePermeablePlatform();
+                {
+                    if (HandlePermeablePlatform() == -1)
+                        continue;
+                }
 
                 if (hit.transform.gameObject.layer == 30)
                 {
                     LayerMask throughMask = 0;
                     throughMask |= 1 << (cinfo.inA ? 10 : 9);
-                    RaycastHit2D throughHit = Physics2D.Raycast(hit.point, Vector2.up * dir, rayLength - hit.distance, throughMask);
+                    RaycastHit2D throughHit = Physics2D.Raycast(hit.point, this.transform.rotation * (Vector2.up * dir), rayLength - hit.distance, throughMask);
 
                     if (throughHit)
                     {
@@ -217,8 +220,8 @@ public class EntityMotor : RayManager
 
     #endregion
 
-        Debug.DrawRay(leftOrigin , Vector2.down, Color.green);
-        Debug.DrawRay(rightOrigin, Vector2.down, Color.white);
+        Debug.DrawRay(leftOrigin , this.transform.rotation * (Vector2.down), Color.green);
+        Debug.DrawRay(rightOrigin, this.transform.rotation * (Vector2.down), Color.white);
     }
 
     #endregion
@@ -227,7 +230,7 @@ public class EntityMotor : RayManager
     protected virtual void OnLanded()                  { }
     protected virtual void OnWalkOffLedge()            { }
     protected virtual void OnReachedLedge(bool _right) { }
-    protected virtual void HandlePermeablePlatform()   { }
+    protected virtual int  HandlePermeablePlatform()   { return 0; }
     protected virtual void EntityPassedThroughPortal() { }
     #endregion
 

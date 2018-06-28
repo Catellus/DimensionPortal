@@ -70,7 +70,9 @@ public class PlayerController : EntityMotor
     {
         m_walkInput = Input.GetAxisRaw("Horizontal");
         if (Input.GetButtonDown("Jump")) OnJumpPressed();
-        if (Input.GetButtonUp("Jump")) OnJumpReleased();
+        if (Input.GetButtonUp  ("Jump")) OnJumpReleased();
+        if (Input.GetButtonDown("Fire")) OnFirePressed();
+        if (Input.GetButtonUp  ("Fire")) OnFireReleased();
     }
 
     void CheckJumpApexReached()
@@ -93,9 +95,12 @@ public class PlayerController : EntityMotor
         }
     }
 
-    protected override void HandlePermeablePlatform()
+    protected override int HandlePermeablePlatform()
     {
-        
+        if (cinfo.throughPlatform)
+            return -1;
+
+        return 0;
     }
 
     protected override void EntityPassedThroughPortal()
@@ -105,8 +110,38 @@ public class PlayerController : EntityMotor
 
 
     #region Input Functions
-    void OnJumpPressed() { m_velocity.y = m_maxJumpVelocity; m_rising = true; }
+    void OnJumpPressed()  { m_velocity.y = m_maxJumpVelocity; m_rising = true; }
     void OnJumpReleased() { }
+
+    bool placingPortal;
+
+    public GameObject portalSphere;
+    PortalBallController ptlSphere;
+
+    void OnFirePressed()
+    {
+        if (ptlSphere == null)
+            placingPortal = false;
+
+        if (placingPortal)
+        {
+            ptlSphere.SetPortal();
+            placingPortal = false;
+        }
+        else
+        {
+            Vector2 direction = ((Vector2)cam.CamA.ScreenToWorldPoint(Input.mousePosition) - (Vector2)this.transform.position).normalized;
+            Debug.DrawLine(this.transform.position, this.transform.position + (Vector3)direction);
+
+            Quaternion rot = Quaternion.FromToRotation(Vector2.right, direction);
+            ptlSphere = Instantiate(portalSphere, this.transform.position, rot).GetComponent<PortalBallController>();
+
+            ptlSphere.SyncSettings(cinfo, collisionMask, portal);
+            //ptlSphere.SyncSettings(cinfo, collisionMask, portal);
+            placingPortal = true;
+        }
+    }
+    void OnFireReleased() { }
 
     #endregion
 }

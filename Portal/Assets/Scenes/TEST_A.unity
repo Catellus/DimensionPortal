@@ -205,7 +205,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 176162096}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalPosition: {x: 0, y: -9, z: 0}
   m_LocalScale: {x: 15.1875, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -511,7 +511,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1172329040}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.65, y: 2, z: 0}
+  m_LocalPosition: {x: 0.65, y: -6, z: 0}
   m_LocalScale: {x: 1, y: 5, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -574,7 +574,6 @@ GameObject:
   - component: {fileID: 1267152335}
   - component: {fileID: 1267152334}
   - component: {fileID: 1267152333}
-  - component: {fileID: 1267152332}
   - component: {fileID: 1267152331}
   m_Layer: 8
   m_Name: Player
@@ -598,11 +597,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1073742336
   raySpacing: 0.2
-  collider: {fileID: 0}
-  sideRaySpacing: 0
-  capRaySpacing: 0
-  sideRayCount: 0
-  capRayCount: 0
+  skinBuffer: 0.015
+  entityHeight: 1
+  entityWidth: 1
   portal: {fileID: 1983922523}
   cinfo:
     below: 0
@@ -615,9 +612,6 @@ MonoBehaviour:
     throughPlatform: 0
     facingDirection: 0
     inA: 0
-  throughPortalCollision:
-    serializedVersion: 2
-    m_Bits: 0
   maxWalkSpeed: 6
   accelerationTime: 0.1
   maxJumpHeight: 3.5
@@ -627,31 +621,8 @@ MonoBehaviour:
   crouching: 0
   crouchHeightPercent: 0.5
   cam: {fileID: 1207751597}
---- !u!61 &1267152332
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1267152330}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  portalSphere: {fileID: 1528249856479822, guid: ecafd14f6ae16c448ad78a9cab186a34,
+    type: 2}
 --- !u!23 &1267152333
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -701,7 +672,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1267152330}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.01, y: 1.11, z: -0.0001}
+  m_LocalPosition: {x: -3.73, y: 0.75, z: -0.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -857,7 +828,7 @@ GameObject:
   m_Layer: 30
   m_Name: Portal
   m_TagString: Portal
-  m_Icon: {fileID: 419385456094870383, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -875,7 +846,7 @@ MonoBehaviour:
   playerLocation: {fileID: 1267152335}
   loadDistance: 20
   switchDistance: 0.85
-  loadAlpha: 0
+  loadAlpha: 1
   halfHeight: 1
   topLocation: {x: 0, y: 0, z: 0}
   bottomLocation: {x: 0, y: 0, z: 0}
@@ -886,7 +857,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1983922522}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.27, y: 1, z: 0}
+  m_LocalPosition: {x: 9.37, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1563553909}

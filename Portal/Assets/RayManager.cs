@@ -1,18 +1,16 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(BoxCollider2D))]
 public class RayManager : MonoBehaviour
 {
     [Header("RayManager")]
     public LayerMask collisionMask;
     public float raySpacing = 0.2f;
-    public const float skinBuffer = 0.015f;
+    public float skinBuffer = 0.015f;
 
-    [HideInInspector]public new BoxCollider2D collider;
-    [HideInInspector]public float sideRaySpacing;
-    [HideInInspector]public float capRaySpacing;
-    [HideInInspector]public int sideRayCount;
-    [HideInInspector]public int capRayCount;
+    protected float sideRaySpacing;
+    protected float capRaySpacing;
+    protected int   sideRayCount;
+    protected int   capRayCount;
 
     public originPoints rayOrigins;
     public struct originPoints{
@@ -25,8 +23,8 @@ public class RayManager : MonoBehaviour
 
     public virtual void Awake()
     {
-        collider = GetComponent<BoxCollider2D>();
-        portal = GameObject.FindGameObjectWithTag("Portal").GetComponent<tmp_Portal>();
+        if (portal == null)
+            portal = GameObject.FindGameObjectWithTag("Portal").GetComponent<tmp_Portal>();
     }
 
     public virtual void Start()
@@ -34,13 +32,13 @@ public class RayManager : MonoBehaviour
         DetermineRaySpacing();
     }
 
+    public float entityHeight = 1.0f;
+    public float entityWidth  = 1.0f;
+
     public void DetermineRaySpacing()
     {
-        Bounds bounds = collider.bounds;
-        bounds.Expand(-2 * skinBuffer);
-
-        float bWidth  = bounds.size.x;
-        float bHeight = bounds.size.y;
+        float bWidth  = entityWidth  + (-2 * skinBuffer);
+        float bHeight = entityHeight + (-2 * skinBuffer);
 
         capRayCount  = Mathf.Clamp(Mathf.CeilToInt(bWidth  / raySpacing), 2, int.MaxValue);
         sideRayCount = Mathf.Clamp(Mathf.CeilToInt(bHeight / raySpacing), 2, int.MaxValue);
@@ -53,19 +51,17 @@ public class RayManager : MonoBehaviour
 
     public void UpdateRayOrigins()
     {
-        Bounds bounds = collider.bounds;
-        bounds.Expand(-2 * skinBuffer);
+        float tmpSkin = -2 * skinBuffer;
+        Vector2 e = (new Vector2((entityWidth + tmpSkin) / 2, (entityHeight + tmpSkin)/2));
+        Vector2 c = this.transform.position;
 
-        rayOrigins.topLeft     = new Vector2(bounds.min.x, bounds.max.y);
-        rayOrigins.topRight    = new Vector2(bounds.max.x, bounds.max.y);
-        rayOrigins.bottomLeft  = new Vector2(bounds.min.x, bounds.min.y);
-        rayOrigins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);
+        rayOrigins.topRight    = c + (Vector2)(this.transform.rotation *  new Vector2( e.x,  e.y));
+        rayOrigins.topLeft     = c + (Vector2)(this.transform.rotation *  new Vector2(-e.x,  e.y));
+        rayOrigins.bottomLeft  = c + (Vector2)(this.transform.rotation *  new Vector2(-e.x, -e.y));
+        rayOrigins.bottomRight = c + (Vector2)(this.transform.rotation *  new Vector2( e.x, -e.y));
     }
 
     public tmp_Portal portal;
-
-    Vector2 b;
-    Vector2 a;
 
     public float GetPortalPassDistance(Vector3 _location)
     {
@@ -73,4 +69,22 @@ public class RayManager : MonoBehaviour
         Vector3 pointOnPlane = Vector3.ProjectOnPlane(playerOffset, portal.transform.up);
         return (((pointOnPlane.x - Vector2.zero.x)) / (portal.transform.right.x));
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(Vector3.zero), Vector3.one);
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(rayOrigins.topLeft, 0.05f);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(rayOrigins.topRight, 0.05f);
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(rayOrigins.bottomLeft, 0.05f);
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawSphere(rayOrigins.bottomRight, 0.05f);
+
+        Gizmos.color = new Color(0.25f, 1.0f, 0.25f, 1.0f);
+        Gizmos.matrix = Matrix4x4.TRS(this.transform.position, this.transform.rotation, Vector3.one);
+        Gizmos.DrawWireCube(Vector3.zero, new Vector3(entityWidth, entityHeight, 1.0f));
+    }
+
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Permeable
   - Portal
+  - PortalSphere
   layers:
   - Default
   - TransparentFX
@@ -36,7 +37,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - PortalSphere
   - Portal
   - PortalView
   m_SortingLayers:

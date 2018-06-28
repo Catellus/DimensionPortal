@@ -69,10 +69,10 @@ public class tmp_Portal : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = new Vector4(1, 1, 1, loadAlpha);
-        Gizmos.DrawSphere(this.transform.position, loadDistance);
+        Gizmos.DrawWireSphere(this.transform.position, loadDistance);
 
         Gizmos.color = new Vector4(1, 0, 0, loadAlpha);
-        Gizmos.DrawSphere(this.transform.position, switchDistance);
+        Gizmos.DrawWireSphere(this.transform.position, switchDistance);
 
     }
 }

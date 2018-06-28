@@ -36,7 +36,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1528249856479822}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -1.392439, y: 2.458708, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -99,7 +99,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   raySpacing: 0.05
-  skinBuffer: 0
+  skinBuffer: 0.015
   entityHeight: 0.5
   entityWidth: 0.5
   portal: {fileID: 0}

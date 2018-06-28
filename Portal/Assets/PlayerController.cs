@@ -130,7 +130,7 @@ public class PlayerController : EntityMotor
         }
         else
         {
-            Vector2 direction = ((Vector2)cam.CamA.ScreenToWorldPoint(Input.mousePosition) - (Vector2)this.transform.position).normalized;
+            Vector2 direction = ((Vector2)cam.playerWorldCam.ScreenToWorldPoint(Input.mousePosition) - (Vector2)this.transform.position).normalized;
             Debug.DrawLine(this.transform.position, this.transform.position + (Vector3)direction);
 
             Quaternion rot = Quaternion.FromToRotation(Vector2.right, direction);

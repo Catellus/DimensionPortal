@@ -6,7 +6,7 @@ public class PortalBallController : EntityMotor
 {
     private void FixedUpdate()
     {
-        Move(new Vector2(3, 0) * Time.fixedDeltaTime);
+        Move(new Vector2(5, 0) * Time.fixedDeltaTime);
 
         if (cinfo.right || cinfo.left || cinfo.above || cinfo.below)
         {

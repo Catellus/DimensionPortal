@@ -5,15 +5,18 @@ public class CamerasController : MonoBehaviour
     public Transform player;
 
     [Space]
-    public Camera CamA, CamB, CamC;
+    public Camera playerWorldCam, viewWorldCam;
 
     RenderTexture rt;
 
     private void Start()
     {
         rt = new RenderTexture(Screen.width, Screen.height, 24);
-        CamB.targetTexture = rt;
+        viewWorldCam.targetTexture = rt;
         Shader.SetGlobalTexture("_MainTex", rt);
+
+        //playerWorldCam.backgroundColor = blueish;
+        //viewWorldCam.backgroundColor = redish;
     }
 
     private void LateUpdate()
@@ -28,14 +31,13 @@ public class CamerasController : MonoBehaviour
 
     public void ChangeDimension(bool _NowInA)
     {
-        CamB.cullingMask &= ~(1 << (_NowInA ? 9 : 10)); //If in worldA? remove world A : remove world B  --Does not affect any other collision layers set
-        CamB.cullingMask |=   1 << (_NowInA ? 10 : 9);    //If in worldA?    add world B :    add world A  --Does not affect any other collision layers set
-        CamB.backgroundColor = _NowInA ? blueish : redish;
+        viewWorldCam.cullingMask &= ~(1 << (_NowInA ? 9 : 10)); //If in worldA? remove world A : remove world B  --Does not affect any other collision layers set
+        viewWorldCam.cullingMask |=   1 << (_NowInA ? 10 : 9);  //If in worldA?    add world B :    add world A  --Does not affect any other collision layers set
+        viewWorldCam.backgroundColor = _NowInA ? blueish : redish;
 
-
-        CamA.cullingMask &= ~(1 << (_NowInA ? 10 : 9)); //If in worldA? remove world A : remove world B  --Does not affect any other collision layers set
-        CamA.cullingMask |=   1 << (_NowInA ? 9 : 10);    //If in worldA?    add world B :    add world A  --Does not affect any other collision layers set
-        CamA.backgroundColor = _NowInA ? redish : blueish;
+        playerWorldCam.cullingMask &= ~(1 << (_NowInA ? 10 : 9)); //If in worldA? remove world A : remove world B  --Does not affect any other collision layers set
+        playerWorldCam.cullingMask |=   1 << (_NowInA ? 9 : 10);  //If in worldA?    add world B :    add world A  --Does not affect any other collision layers set
+        playerWorldCam.backgroundColor = _NowInA ? redish : blueish;
     }
 
 }

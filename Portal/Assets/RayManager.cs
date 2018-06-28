@@ -7,6 +7,9 @@ public class RayManager : MonoBehaviour
     public float raySpacing = 0.2f;
     public float skinBuffer = 0.015f;
 
+    public float entityHeight = 1.0f;
+    public float entityWidth = 1.0f;
+
     protected float sideRaySpacing;
     protected float capRaySpacing;
     protected int   sideRayCount;
@@ -18,8 +21,7 @@ public class RayManager : MonoBehaviour
         public Vector2 bottomLeft, bottomRight;
     }
 
-    protected int layerMaskA = 512;
-    protected int layerMaskB = 1024;
+    public tmp_Portal portal;
 
     public virtual void Awake()
     {
@@ -31,9 +33,6 @@ public class RayManager : MonoBehaviour
     {
         DetermineRaySpacing();
     }
-
-    public float entityHeight = 1.0f;
-    public float entityWidth  = 1.0f;
 
     public void DetermineRaySpacing()
     {
@@ -59,15 +58,6 @@ public class RayManager : MonoBehaviour
         rayOrigins.topLeft     = c + (Vector2)(this.transform.rotation *  new Vector2(-e.x,  e.y));
         rayOrigins.bottomLeft  = c + (Vector2)(this.transform.rotation *  new Vector2(-e.x, -e.y));
         rayOrigins.bottomRight = c + (Vector2)(this.transform.rotation *  new Vector2( e.x, -e.y));
-    }
-
-    public tmp_Portal portal;
-
-    public float GetPortalPassDistance(Vector3 _location)
-    {
-        Vector3 playerOffset = _location - portal.transform.position;
-        Vector3 pointOnPlane = Vector3.ProjectOnPlane(playerOffset, portal.transform.up);
-        return (((pointOnPlane.x - Vector2.zero.x)) / (portal.transform.right.x));
     }
 
     private void OnDrawGizmos()

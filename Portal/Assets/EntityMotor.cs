@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using ToolBox;
 
 public class EntityMotor : RayManager
 {
@@ -21,7 +22,7 @@ public class EntityMotor : RayManager
     }
 
     float distanceToPortalCenter;
-    float entitySideOfPortal;
+    int entitySideOfPortal;
     LayerMask throughPortalCollision;
 
     #endregion
@@ -64,6 +65,13 @@ public class EntityMotor : RayManager
         CheckEntityPassedThroughPortal();
     }
 
+    Vector2 tmp(Vector2 _location)
+    {
+        Vector3 playerOffset = _location - (Vector2)portal.transform.position;
+        Vector3 pointOnPlane = Vector3.ProjectOnPlane(playerOffset, portal.transform.up);
+        return pointOnPlane;
+    }
+
     #region Collision
 
     public void CheckHorizontalCollision(ref Vector2 _ammount)
@@ -97,14 +105,14 @@ public class EntityMotor : RayManager
                     if (throughHit)
                     {
                         _ammount.x = ((hit.distance + throughHit.distance) - skinBuffer) * dir;
-                        cinfo.left = dir == -1;
+                        cinfo.left  = dir == -1;
                         cinfo.right = dir == 1;
                     }
                 }
                 else
                 {
                     _ammount.x = (hit.distance - skinBuffer) * dir;
-                    cinfo.left = dir == -1;
+                    cinfo.left  = dir == -1;
                     cinfo.right = dir == 1;
                 }
 
@@ -168,12 +176,23 @@ public class EntityMotor : RayManager
         throughPortalCollision = collisionMask;
     }
 
+    public float GetPortalPassDistance(Vector2 _location)
+    {
+        Vector2 playerOffset = MathTools.RoundVector3(_location - (Vector2)portal.transform.position, 6);
+        Vector2 pointOnPlane = (Vector2)MathTools.RoundVector3(Vector3.ProjectOnPlane(playerOffset, portal.transform.up), 6);
+
+        float a = pointOnPlane.x / portal.transform.right.x;
+        a = (a == 0) ? (pointOnPlane.y / portal.transform.right.y) : a;
+
+        return (float)System.Math.Round(a, 4);
+    }
+
     void GetTraceThroughPortal(ref LayerMask _mask, Vector3 _position)
     {
         if ((int)Mathf.Sign(GetPortalPassDistance(_position)) != entitySideOfPortal)
         {
             _mask &= ~(1 << (cinfo.inA ? 9 : 10)); //If in worldA? remove world A : remove world B  --Does not affect any other collision layers set
-            _mask |=   1 << (cinfo.inA ? 10 : 9);    //If in worldA?    add world B :    add world A  --Does not affect any other collision layers set
+            _mask |=   1 << (cinfo.inA ? 10 : 9);  //If in worldA?    add world B :    add world A  --Does not affect any other collision layers set
         }
         else
             _mask = collisionMask;
@@ -185,9 +204,10 @@ public class EntityMotor : RayManager
         {
             if (entitySideOfPortal != (int)Mathf.Sign(GetPortalPassDistance(this.transform.position)))
             {
+                print("switch");
                 cinfo.inA = !cinfo.inA;
                 collisionMask &= ~(1 << (cinfo.inA ? 10 : 9)); //If in worldA? remove world A : remove world B  --Does not affect any other collision layers set
-                collisionMask |=   1 << (cinfo.inA ? 9 : 10);    //If in worldA?    add world B :    add world A  --Does not affect any other collision layers set
+                collisionMask |=   1 << (cinfo.inA ? 9 : 10);  //If in worldA?    add world B :    add world A  --Does not affect any other collision layers set
                 EntityPassedThroughPortal();
             }
         }

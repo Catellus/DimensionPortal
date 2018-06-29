@@ -48,6 +48,8 @@ public class ViewQuadManipulator : MonoBehaviour
     {
         if (portal == null)
             portal = GameObject.FindGameObjectWithTag("Portal").GetComponent<PortalManager>();
+        if (viewWorldCam == null)
+            viewWorldCam = GameObject.FindGameObjectWithTag("Cameras").GetComponent<CamerasController>().viewWorldCam;
     }
 
     private void Start()

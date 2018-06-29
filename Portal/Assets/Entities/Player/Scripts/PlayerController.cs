@@ -39,6 +39,18 @@ public class PlayerController : EntityMotor
 
     #endregion
 
+    public override void Awake()
+    {
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag(this.gameObject.tag))
+        {
+            if (go != this.gameObject)
+                Destroy(this.gameObject);
+        }
+        base.Awake();
+        if (cameraController == null)
+            cameraController = GameObject.FindGameObjectWithTag("Cameras").GetComponent<CamerasController>();
+    }
+
     public override void Start()
     {
         base.Start();
@@ -113,6 +125,7 @@ public class PlayerController : EntityMotor
 
     protected override void EntityPassedThroughPortal()
     {
+        portal.SwitchWorlds(cinfo.inA);
         cameraController.ChangeDimension(cinfo.inA);
     }
 

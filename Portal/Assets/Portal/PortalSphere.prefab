@@ -112,5 +112,6 @@ MonoBehaviour:
     edgeRight: 0
     isFalling: 0
     throughPlatform: 0
-    facingDirection: 0
     inA: 0
+    facingDirection: 0
+  movementSpeed: 5

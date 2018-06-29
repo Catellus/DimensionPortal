@@ -16,6 +16,18 @@ public class CamerasController : MonoBehaviour
 
     #endregion //Variables
 
+    public void Awake()
+    {
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag(this.gameObject.tag))
+        {
+            if (go != this.gameObject)
+                Destroy(this.gameObject);
+        }
+
+        if (player == null)
+            player = GameObject.FindGameObjectWithTag("Player").transform;
+    }
+
     private void Start()
     {
         //Create and set render target for the view quad
@@ -32,6 +44,7 @@ public class CamerasController : MonoBehaviour
 
     public void ChangeDimension(bool _NowInA)
     {
+        print(_NowInA);
         viewWorldCam.cullingMask &= ~(1 << (_NowInA ? 9 : 10));   //Remove layer player is in     (WorldA : WorldB)
         viewWorldCam.cullingMask |=   1 << (_NowInA ? 10 : 9);    //Add    layer player is not in (WorldB : WorldA)
         viewWorldCam.backgroundColor = _NowInA ? blueish : redish;

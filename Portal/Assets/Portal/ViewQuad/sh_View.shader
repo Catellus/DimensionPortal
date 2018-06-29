@@ -1,10 +1,5 @@
 ﻿Shader "Unlit/View"
 {
-    Properties
-    {
-        //_MainTex ("Texture", 2D) = "white" {}
-        //_WorldTex("View World Texture", 2D) = "world" {}
-    }
     SubShader
     {
         Tags { "RenderType"="Opaque" }

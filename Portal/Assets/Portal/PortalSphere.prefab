@@ -98,11 +98,11 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 512
+  portal: {fileID: 0}
   raySpacing: 0.05
   skinBuffer: 0.015
   entityHeight: 0.5
   entityWidth: 0.5
-  portal: {fileID: 0}
   cinfo:
     below: 0
     above: 0

@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: c
+  m_Name: m_ViewQuad
   m_Shader: {fileID: 4800000, guid: d5545927107073f4a9beceaef1d528b2, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4

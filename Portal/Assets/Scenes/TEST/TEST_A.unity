@@ -113,6 +113,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!23 &6489183 stripped
+MeshRenderer:
+  m_PrefabParentObject: {fileID: 23959892715078102, guid: d817d5f1e0d68434eae7b05c1a612b45,
+    type: 2}
+  m_PrefabInternal: {fileID: 1723094853}
 --- !u!1 &176162096
 GameObject:
   m_ObjectHideFlags: 0
@@ -318,7 +323,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4250929718994962, guid: d817d5f1e0d68434eae7b05c1a612b45, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -4.5
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 4250929718994962, guid: d817d5f1e0d68434eae7b05c1a612b45, type: 2}
       propertyPath: m_LocalPosition.y
@@ -347,21 +352,6 @@ Prefab:
     - target: {fileID: 4250929718994962, guid: d817d5f1e0d68434eae7b05c1a612b45, type: 2}
       propertyPath: m_RootOrder
       value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114534168971835770, guid: d817d5f1e0d68434eae7b05c1a612b45,
-        type: 2}
-      propertyPath: worldA
-      value: TEST_A
-      objectReference: {fileID: 0}
-    - target: {fileID: 114534168971835770, guid: d817d5f1e0d68434eae7b05c1a612b45,
-        type: 2}
-      propertyPath: worldB
-      value: TEST_B
-      objectReference: {fileID: 0}
-    - target: {fileID: 114534168971835770, guid: d817d5f1e0d68434eae7b05c1a612b45,
-        type: 2}
-      propertyPath: worldLoadDistance
-      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d817d5f1e0d68434eae7b05c1a612b45, type: 2}
@@ -447,6 +437,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114486117594281172, guid: 63e6e2efcdbc8ed4f90fa05a21de08d5,
+        type: 2}
+      propertyPath: quad
+      value: 
+      objectReference: {fileID: 6489183}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 63e6e2efcdbc8ed4f90fa05a21de08d5, type: 2}
   m_IsPrefabParent: 0

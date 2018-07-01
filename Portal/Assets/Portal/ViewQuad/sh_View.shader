@@ -7,6 +7,7 @@
 
         Pass
         {
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -33,6 +34,7 @@
             {
                 FragIn o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
+                //o.vertex.z = 0;
                 o.uv = v.uv;
                 o.screen_uv = float3((o.vertex.xy + o.vertex.w) * 0.5, o.vertex.w);
 

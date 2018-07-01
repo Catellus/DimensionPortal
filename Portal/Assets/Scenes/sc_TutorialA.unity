@@ -544,10 +544,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4250929718994962, guid: d817d5f1e0d68434eae7b05c1a612b45, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 90.034004
-      objectReference: {fileID: 0}
     - target: {fileID: 114534168971835770, guid: d817d5f1e0d68434eae7b05c1a612b45,
         type: 2}
       propertyPath: worldA
@@ -557,10 +553,6 @@ Prefab:
         type: 2}
       propertyPath: worldB
       value: sc_TutorialB
-      objectReference: {fileID: 0}
-    - target: {fileID: 4648985471705538, guid: d817d5f1e0d68434eae7b05c1a612b45, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d817d5f1e0d68434eae7b05c1a612b45, type: 2}

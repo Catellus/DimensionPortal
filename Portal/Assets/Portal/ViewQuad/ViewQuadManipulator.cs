@@ -17,6 +17,10 @@ public class ViewQuadManipulator : MonoBehaviour
     private PortalManager portal;
     private Transform     player;
 
+    [Space, Header("Depth Quad")]
+    public GameObject depthQuad;
+    private MeshFilter depthFilter;
+    public Material depthMaterial;
 
     private Vector3 topLocalPosition, bottomLocalPosition; //Local position of poral's ends
     private Vector3 topFOVSlope, bottomFOVSlope;           //Slope from ends of portal to the player
@@ -59,6 +63,9 @@ public class ViewQuadManipulator : MonoBehaviour
         quad = new Mesh();                                          //Creates new mesh
         filter = this.gameObject.AddComponent<MeshFilter>();        //Creates MeshFilter -- stores mesh.
         this.GetComponent<MeshRenderer>().sharedMaterial = texture; //Sets render texture
+
+        depthFilter = depthQuad.AddComponent<MeshFilter>();
+        depthQuad.GetComponent<MeshRenderer>().sharedMaterial = depthMaterial;
     }
 
     private void LateUpdate()
@@ -87,6 +94,7 @@ public class ViewQuadManipulator : MonoBehaviour
             quad.RecalculateBounds();  //unnecessary?
 
             filter.sharedMesh = quad;
+            depthFilter.sharedMesh = quad;
         }
     }
 

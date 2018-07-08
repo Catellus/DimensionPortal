@@ -17,9 +17,9 @@ public class PlayerController : EntityMotor
     private float   m_smoothedYVelocity;   //DEBUG: only used for no gravity movement
 
     [Space, Header("Controller - Jumping")]
-    public float maxJumpHeight = 3.5f;  //Highest the player can jump from the start position
-    public float minJumpHeight = 0.5f;  //Lowest  the player can jump from the start position
-    public float timeToMaxApex = 0.35f; //Time in seconds it takes the player to reach the highest possible jump
+    public float maxJumpHeight = 3.5f;            //Highest the player can jump from the start position
+    public float minJumpHeight = 0.5f;            //Lowest  the player can jump from the start position
+    public float timeToMaxApex = 0.35f;           //Time in seconds it takes the player to reach the highest possible jump
     public float DEBUG_DownGravMultiplier = 1.7f; //Value muliplied by rising gravity to find falling gravity
 
     private float m_fallingGravity;  //Velocity added to the player's Y velocity when not rising in a jump
@@ -91,6 +91,9 @@ public class PlayerController : EntityMotor
         if (Input.GetButtonUp  ("Jump")) OnJumpReleased();
         if (Input.GetButtonDown("Fire")) OnFirePressed();
         if (Input.GetButtonUp  ("Fire")) OnFireReleased();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+            print("QUIT"); //Figure out what Unity's quit game function is.
     }
 
     void CheckJumpApexReached()

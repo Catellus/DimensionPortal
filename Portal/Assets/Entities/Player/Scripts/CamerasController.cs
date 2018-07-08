@@ -15,10 +15,10 @@ public class CamerasController : MonoBehaviour
     Color blueish = new Color(0.19215686274f, 0.30196078431f, 0.47450980392f, 1.0f); //WorldA clear color
     Color redish  = new Color(0.47450980392f, 0.19215686274f, 0.21176470588f, 1.0f); //WorldB clear color
 
-    private CommandBuffer m_depthBuffer;
-    public Renderer quad;
+    private CommandBuffer m_depthBuffer; //Used to only render what the player can see with the view quad
+    public Renderer quad;                //Used to only render what the player can see with the view quad
 
-    bool inA = true;
+    bool inA = true; //Is player in world A?
 
     #endregion //Variables
 
@@ -33,12 +33,12 @@ public class CamerasController : MonoBehaviour
         if (player == null)
             player = GameObject.FindGameObjectWithTag("Player").transform;
 
-        m_depthBuffer = new CommandBuffer();
-        m_depthBuffer.ClearRenderTarget(true, true, redish, 0);
-        m_depthBuffer.name = "View quad depth buffer";
-        m_depthBuffer.DrawRenderer(quad, new Material(Shader.Find("Unlit/sh_Depth")));
+        m_depthBuffer = new CommandBuffer();                                           //Creates function used to optimize view rendering
+        m_depthBuffer.ClearRenderTarget(true, true, redish, 0);                        //Sets clear color
+        m_depthBuffer.name = "View quad depth buffer";                                 //Names the buffer command
+        m_depthBuffer.DrawRenderer(quad, new Material(Shader.Find("Unlit/sh_Depth"))); //Use the depth shader to only render what the view can see
 
-        viewWorldCam.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, m_depthBuffer);
+        viewWorldCam.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, m_depthBuffer); //Adds the function onto the view camera
     }
 
     private void Start()
@@ -52,12 +52,12 @@ public class CamerasController : MonoBehaviour
     private void LateUpdate()
     {
         //Set camera X & Y to player's
-        this.transform.position = player.position + new Vector3(0, 0, -10);
+        this.transform.position = player.position + new Vector3(0, 0, -10); //Keeps the player center screen
     }
 
     private void UpdateDepthCullColor()
     {
-        m_depthBuffer.ClearRenderTarget(false, true, inA ? redish : blueish, 0);
+        m_depthBuffer.ClearRenderTarget(false, true, inA ? redish : blueish, 0); //Changes view's cleear color based on player's current world
     }
 
     public void ChangeDimension(bool _NowInA)

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 //TODO: Make a buffer of System.Math.Round(playerLocalPosition.x, 4) on either side of the portal before switching view
 //      (Makes the switch smoother by not having a point where it may flash.)
@@ -100,13 +98,13 @@ public class ViewQuadManipulator : MonoBehaviour
 
     void MakeQuad()
     {
-        topLocalPosition = new Vector3(0, portal.portalHalfHeight, 0);
-        bottomLocalPosition = new Vector3(0, -portal.portalHalfHeight, 0);
-        topFOVSlope = (topLocalPosition - playerLocalPosition).normalized;
-        bottomFOVSlope = (bottomLocalPosition - playerLocalPosition).normalized;
+        topLocalPosition    = new Vector3(0,  portal.portalHalfHeight, 0);       //Locates the portal's top    position
+        bottomLocalPosition = new Vector3(0, -portal.portalHalfHeight, 0);       //Locates the portal's bottom position
+        topFOVSlope    = (topLocalPosition    - playerLocalPosition).normalized; //Finds the slope from the player's position to the portal's top    position
+        bottomFOVSlope = (bottomLocalPosition - playerLocalPosition).normalized; //Finds the slope from the player's position to the portal's bottom position
 
-        int topHitSide = 0;
-        int bottomHitSide = 0;
+        int topHitSide = 0;    //Side of the screen the top    line collides with -- (top = 1)(Left = 2)(bottom = 4)(right = 8)
+        int bottomHitSide = 0; //Side of the screen the bottom line collides with -- (top = 1)(Left = 2)(bottom = 4)(right = 8)
 
         quadVerts[0] = topLocalPosition;
         quadVerts[1] = bottomLocalPosition;

@@ -7,7 +7,7 @@ public class PlayerController : EntityMotor
 
     [Space, Header("Controller - Movement")]
     public bool  bUseDebugYMovement;      //DEBUG: Toggles gravity usage
-    public float maxWalkSpeed     = 6.0f; //Entity's maximum horizonal velocity (meters per second)
+    public float maxWalkSpeed     = 6.0f; //Entity's maximum horizontal velocity (meters per second)
     public float accelerationTime = 0.1f; //Time in seconds to reach top speed from zero.
 
     private Vector2 m_velocity;            //Velocity passed into EnityMotor.Move -- Stores desired velocity
@@ -20,7 +20,7 @@ public class PlayerController : EntityMotor
     public float maxJumpHeight = 3.5f;            //Highest the player can jump from the start position
     public float minJumpHeight = 0.5f;            //Lowest  the player can jump from the start position
     public float timeToMaxApex = 0.35f;           //Time in seconds it takes the player to reach the highest possible jump
-    public float DEBUG_DownGravMultiplier = 1.7f; //Value muliplied by rising gravity to find falling gravity
+    public float DEBUG_DownGravMultiplier = 1.7f; //Value multiplied by rising gravity to find falling gravity
 
     private float m_fallingGravity;  //Velocity added to the player's Y velocity when not rising in a jump
     private float m_risingGravity;   //Velocity added to the player's Y velocity when rising in a jump
@@ -28,27 +28,15 @@ public class PlayerController : EntityMotor
     //private float m_minJumpVelocity; //Value set as the player's Y velocity to reach the MinJumpHeight
     private bool  m_bRising;         //True if the player is rising in their jump -- Used to determine the gravity acting upon the player
 
-    [Space, Header("Controller - Cameras")]
-    public CamerasController cameraController; //Cameras showing the A and B versions of the current level
-
-    [Space, Header("Controller - Portal")]
-    public GameObject portalSphere_prefab; //Prefab spawned by the player used to move and rotate the portal
-
-    private bool        m_bPlacingPortal; //Used to determine to spawn a portalSphere or relocate the portal
-    private PortalSphere m_portalSphere;  //Reference to a portalSphere spawned by the player
-
     #endregion
 
-    public override void Awake()
+    public virtual void Awake()
     {
         foreach (GameObject go in GameObject.FindGameObjectsWithTag(this.gameObject.tag))
         {
             if (go != this.gameObject)
                 Destroy(this.gameObject);
         }
-        base.Awake();
-        if (cameraController == null)
-            cameraController = GameObject.FindGameObjectWithTag("Cameras").GetComponent<CamerasController>();
     }
 
     public override void Start()
@@ -72,8 +60,10 @@ public class PlayerController : EntityMotor
         HandleInput();
     }
 
-    private void FixedUpdate()
+    public override void FixedUpdate()
     {
+        base.FixedUpdate();
+
         if (cinfo.isFalling) //If the player is not grounded, determine if risingGravity or fallingGravity should be used
             CheckJumpApexReached();
 
@@ -89,8 +79,6 @@ public class PlayerController : EntityMotor
         m_horizontalInput = Input.GetAxisRaw("Horizontal"); //Sets desired horizontal velocity right as player presses button
         if (Input.GetButtonDown("Jump")) OnJumpPressed();
         if (Input.GetButtonUp  ("Jump")) OnJumpReleased();
-        if (Input.GetButtonDown("Fire")) OnFirePressed();
-        if (Input.GetButtonUp  ("Fire")) OnFireReleased();
 
         if (Input.GetKeyDown(KeyCode.Escape))
             print("QUIT"); //Figure out what Unity's quit game function is.
@@ -126,13 +114,6 @@ public class PlayerController : EntityMotor
         return 0;
     }
 
-    protected override void EntityPassedThroughPortal()
-    {
-        portal.SwitchWorlds(cinfo.inA);
-        cameraController.ChangeDimension(cinfo.inA);
-    }
-
-
     #region Input Functions
 
     // JUMP
@@ -145,37 +126,6 @@ public class PlayerController : EntityMotor
         }
     }
     void OnJumpReleased()
-    {
-        
-    }
-
-    // FIRE PORTAL
-    void OnFirePressed()
-    {
-        if (m_portalSphere == null)
-            m_bPlacingPortal = false;
-
-        if (m_bPlacingPortal) //If a portalSphere exists, set the portal's new location
-        {
-            m_portalSphere.SetPortal();
-            m_bPlacingPortal = false;
-        }
-        else //If a portalSphere does not exist, spawn one
-        {
-            //TODO: Add controller support for this action
-            //Gets the direction from the player to the cursor.
-            Vector2 direction = ((Vector2)cameraController.playerWorldCam.ScreenToWorldPoint(Input.mousePosition) - (Vector2)this.transform.position).normalized;
-
-            //Gets the rotation of the direction and spawns a new portalSphere
-            Quaternion rotation = Quaternion.FromToRotation(Vector2.right, direction);
-            m_portalSphere = Instantiate(portalSphere_prefab, this.transform.position, rotation).GetComponent<PortalSphere>();
-
-            //Ensures the portalSphere is using the correct collision and has a reference to the portal to move
-            m_portalSphere.SyncSettings(cinfo, collisionMask, portal);
-            m_bPlacingPortal = true;
-        }
-    }
-    void OnFireReleased()
     {
         
     }

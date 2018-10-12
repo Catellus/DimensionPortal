@@ -18,9 +18,6 @@ TagManager:
   - 
   - 
   - Player
-  - WorldA
-  - WorldB
-  - CameraSystem
   - 
   - 
   - 
@@ -38,9 +35,12 @@ TagManager:
   - 
   - 
   - 
-  - PortalSphere
-  - Portal
+  - 
+  - 
+  - 
+  - 
   - PortalView
+  - Portal
   m_SortingLayers:
   - name: Default
     uniqueID: 0

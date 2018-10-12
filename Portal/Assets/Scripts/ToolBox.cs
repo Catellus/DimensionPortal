@@ -12,4 +12,9 @@ namespace ToolBox
             return new Vector3(x, y, z);
         }
     }
+
+    public static class ExtensionMethods
+    {
+        
+    }
 }

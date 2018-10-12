@@ -52,6 +52,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4250929718994962}
+  - component: {fileID: 114582135459143610}
   - component: {fileID: 114534168971835770}
   - component: {fileID: 61833377064128592}
   m_Layer: 30
@@ -291,7 +292,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1563843391298106}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68b1204309a5050419fb4a18cb71ad92, type: 3}
   m_Name: 
@@ -302,3 +303,16 @@ MonoBehaviour:
   portalHalfHeight: 1
   worldA: 
   worldB: 
+--- !u!114 &114582135459143610
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1563843391298106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c2d97a78a6937245ad97b4c32dff2b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WorldA: 
+  WorldB: 

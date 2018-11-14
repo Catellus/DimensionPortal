@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerController : EntityMotor
 {
     #region Variables
 
+    [HideInInspector] public CamerasController camController;
 
     [Space, Header("Controller - Movement")]
     public bool  bUseDebugYMovement;      //DEBUG: Toggles gravity usage
@@ -64,7 +66,7 @@ public class PlayerController : EntityMotor
     {
         base.FixedUpdate();
 
-        if (cinfo.isFalling) //If the player is not grounded, determine if risingGravity or fallingGravity should be used
+        if (cinfo.falling) //If the player is not grounded, determine if risingGravity or fallingGravity should be used
             CheckJumpApexReached();
 
         DetermineVelocity();                    //Smooths horizontal velocity and adds gravity
@@ -79,6 +81,8 @@ public class PlayerController : EntityMotor
         m_horizontalInput = Input.GetAxisRaw("Horizontal"); //Sets desired horizontal velocity right as player presses button
         if (Input.GetButtonDown("Jump")) OnJumpPressed();
         if (Input.GetButtonUp  ("Jump")) OnJumpReleased();
+        if (Input.GetKeyDown(KeyCode.S)) OnCrouchPressed();
+        if (Input.GetKeyUp  (KeyCode.S)) OnCrouchReleased();
 
         if (Input.GetKeyDown(KeyCode.Escape))
             print("QUIT"); //Figure out what Unity's quit game function is.
@@ -108,10 +112,15 @@ public class PlayerController : EntityMotor
 
     protected override int HandlePermeablePlatform()
     {
-        if (cinfo.throughPlatform)
+        if (m_velocity.y > 0 || cinfo.throughPlatform)
             return -1;
-
         return 0;
+    }
+
+    protected override void EntityPassedThroughPortal()
+    {
+        base.EntityPassedThroughPortal();
+        //ptlController.viewQuad.UpdateView(camController.transform.position ,reversePortalCycle);
     }
 
     #region Input Functions
@@ -119,7 +128,7 @@ public class PlayerController : EntityMotor
     // JUMP
     void OnJumpPressed()
     {
-        if (!cinfo.isFalling)
+        if (!cinfo.falling)
         {
             m_velocity.y = m_maxJumpVelocity;
             m_bRising = true;
@@ -128,6 +137,25 @@ public class PlayerController : EntityMotor
     void OnJumpReleased()
     {
         
+    }
+
+    // CROUCH & DROP
+    void OnCrouchPressed()
+    {
+        cinfo.crouching = true;
+    }
+    void OnCrouchReleased()
+    {
+        cinfo.crouching = false;
+    }
+
+    public float throughPlatformTime = 0.15f;
+
+    IEnumerator PassThroughPermeable()
+    {
+        cinfo.throughPlatform = true;
+        yield return new WaitForSeconds(throughPlatformTime);
+        cinfo.throughPlatform = false;
     }
 
     #endregion //Input Functions

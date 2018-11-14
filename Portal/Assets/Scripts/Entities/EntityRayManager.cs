@@ -3,9 +3,10 @@
 public class EntityRayManager : MonoBehaviour
 {
     #region Variables
-    [Header("RayManager")]  public  LayerMask           collisionMask;
-                            public  PortalController    ptlController;
-                            public  PortalController[]  visiblePortals;
+    [Header("RayManager")]  public  LayerMask          collisionMask; //Things to collide with
+                            public  LayerMask          detectionMask; //Things to hit, but not collide
+                            public  PortalController   ptlController;
+                            public  PortalController[] visiblePortals;
 
     [SerializeField, Space] protected float raySpacing   = 0.2f;   //Maximum distance between rays
     [SerializeField]        protected float skinBuffer   = 0.015f; //Distance the rays are inset into the entity
@@ -30,7 +31,8 @@ public class EntityRayManager : MonoBehaviour
         public bool below, above;               //Is entity touching a wall above/below of itself (ceiling / floor)
         public bool left, right;                //Is entity touching a wall left/right of itself
         public bool edgeLeft, edgeRight;        //Is entity at an edge on its left/right side
-        public bool isFalling, throughPlatform; //Is entity in mid-air? -- Does entity fall through "Permeable" platforms?
+        public bool falling, throughPlatform;   //Is entity in mid-air? -- Does entity fall through "Permeable" platforms?
+        public bool crouching;                  //Is the entity crouching? -- Affects jumping
         public int worldIndex;                  //Loaded world index the entity is in
         public int facingDirection;             //Direction of entity's "forward" -- -1 faces left, 1 faces right
 

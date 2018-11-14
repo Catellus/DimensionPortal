@@ -12,7 +12,6 @@ public class EntityMotor : EntityRayManager
     #endregion
 
 
-
     public override void Start()
     {
         base.Start();
@@ -20,10 +19,9 @@ public class EntityMotor : EntityRayManager
         cinfo.facingDirection = 1; //Entity faces right by default
     }
 
-
     public void Move(Vector2 _ammount, bool _onPlatform = false)
     {
-        cinfo.isFalling = cinfo.below; //Used to store previous tick's "below" for later use
+        cinfo.falling = cinfo.below; //Used to store previous tick's "below" for later use
         cinfo.Reset();
 
         if (ptlController != null)
@@ -45,9 +43,9 @@ public class EntityMotor : EntityRayManager
         {
             CheckVerticalCollision(ref _ammount);
 
-            if (!cinfo.isFalling && cinfo.below) OnLanded();       //If was not on ground and is now
-            if (cinfo.isFalling && !cinfo.below) OnWalkOffLedge(); //If was on ground and is not now
-            cinfo.isFalling = !cinfo.below;
+            if (!cinfo.falling && cinfo.below) OnLanded();       //If was not on ground and is now
+            if (cinfo.falling && !cinfo.below) OnWalkOffLedge(); //If was on ground and is not now
+            cinfo.falling = !cinfo.below;
         }
 
         this.transform.position += (collisionRotation * _ammount); //Moves the entity
@@ -79,7 +77,7 @@ public class EntityMotor : EntityRayManager
             if (ptlController != null && distanceToPortalCenter <= ptlController.worldSwitchDistance) //Check if origin has passed through Portal
                 GetTraceThroughPortal(ref tmpDepth, origin);
 
-            RaycastHit2D hit = Physics2D.Raycast(origin, testRotation, rayLength, collisionMask, tmpDepth, tmpDepth);
+            RaycastHit2D hit = Physics2D.Raycast(origin, testRotation, rayLength, collisionMask | detectionMask, tmpDepth, tmpDepth);
             Debug.DrawRay(origin, testRotation, Color.blue);
 
             if (hit)
@@ -92,20 +90,30 @@ public class EntityMotor : EntityRayManager
 
     public virtual int HorizontalHitInteraction(RaycastHit2D _hit, Vector2 _rotation, int _direction, float _rayLength, ref Vector2 _ammount)
     {
-        if (_hit.transform.gameObject.layer == 31) //If hit portal, trace other world
+        bool isCollider = (collisionMask & (1 << _hit.transform.gameObject.layer)) == 1;
+
+        if (!isCollider && _hit.transform.gameObject.layer == 31)
         {
-            int hitDepth = ptlController.GetNextIndex(cinfo.worldIndex, reversePortalCycle); //ptlController.nextCollisionLayer;
+            int hitDepth = ptlController.GetNextIndex(cinfo.worldIndex, reversePortalCycle);
             RaycastHit2D throughHit = Physics2D.Raycast(_hit.point, _rotation, _rayLength - _hit.distance, collisionMask, hitDepth, hitDepth);
 
             if (throughHit) //Secondary trace collided
             {
+                if (_hit.collider.tag == "Permeable")
+                    if (HandlePermeablePlatform() == -1) //If the entity collides with a "permeable" platform, handle it in its script
+                        return -1;
+
                 _ammount.x = ((_hit.distance + throughHit.distance) - skinBuffer) * _direction; //Let entity move only the combined distance of the traces
                 cinfo.left  = _direction == -1;
                 cinfo.right = _direction ==  1;
             }
         }
-        else
+        else if (isCollider)
         {
+            if (_hit.collider.tag == "Permeable")
+                if (HandlePermeablePlatform() == -1) //If the entity collides with a "permeable" platform, handle it in its script
+                    return -1;
+
             _ammount.x = (_hit.distance - skinBuffer) * _direction; //Let entity move only the distance of the trace
             cinfo.left  = _direction == -1;
             cinfo.right = _direction ==  1;
@@ -138,7 +146,7 @@ public class EntityMotor : EntityRayManager
             if (ptlController != null && distanceToPortalCenter <= ptlController.worldSwitchDistance) //Check if origin has passed through Portal
                 GetTraceThroughPortal(ref tmpDepth, origin);
 
-            RaycastHit2D hit = Physics2D.Raycast(origin, testRotation, rayLength, collisionMask, tmpDepth, tmpDepth);
+            RaycastHit2D hit = Physics2D.Raycast(origin, testRotation, rayLength, collisionMask | detectionMask, tmpDepth, tmpDepth);
             Debug.DrawRay(origin, testRotation, Color.red);
 
             if (hit)
@@ -150,7 +158,9 @@ public class EntityMotor : EntityRayManager
 
     public virtual int VerticalHitInteraction(RaycastHit2D _hit, Vector2 _rotation, int _direction, float _rayLength, ref Vector2 _ammount)
     {
-        if (_hit.transform.gameObject.layer == 31) //If hit portal, trace other world
+        bool isCollider = (collisionMask & (1 << _hit.transform.gameObject.layer)) == 1;
+
+        if (!isCollider && _hit.transform.gameObject.layer == 31) //If hit portal, trace other world
         {
             int hitDepth = ptlController.GetNextIndex(cinfo.worldIndex, reversePortalCycle); //ptlController.nextCollisionLayer;
             RaycastHit2D throughHit = Physics2D.Raycast(_hit.point, _rotation, _rayLength - _hit.distance, collisionMask, hitDepth, hitDepth);
@@ -162,10 +172,11 @@ public class EntityMotor : EntityRayManager
                 cinfo.above = _direction ==  1;
             }
         }
-        else
+        else if (isCollider)
         {
             if (_hit.collider.tag == "Permeable")
-                return HandlePermeablePlatform(); //If the entity collides with a "permeable" platform, handle it in its script
+                if (HandlePermeablePlatform() == -1) //If the entity collides with a "permeable" platform, handle it in its script
+                    return -1;
 
             _ammount.y = (_hit.distance - skinBuffer) * _direction; //Let entity move only the distance of the trace
             cinfo.below = _direction == -1;
@@ -215,8 +226,8 @@ public class EntityMotor : EntityRayManager
     public float GetPortalPassDistance(Vector2 _location) //Gets the distance along the portal's right vector _location resides
     {
         //MathTools.RoundVector -- Rounds x, y, and Z to specified decimal place
-        Vector2 entityOffset = MathTools.RoundVector3(_location - (Vector2)ptlController.transform.position, 5);                     //Makes "entityOffset" a relative position
-        Vector2 pointOnPlane = (Vector2)MathTools.RoundVector3(Vector3.ProjectOnPlane(entityOffset, ptlController.transform.up), 5); //Gets the nearest point to entityOffset along the portal's right vector
+        Vector2 entityOffset = (Vector2)MathTools.RoundVector3(_location - (Vector2)ptlController.transform.position, 4);            //Makes "entityOffset" a relative position
+        Vector2 pointOnPlane = (Vector2)MathTools.RoundVector3(Vector3.ProjectOnPlane(entityOffset, ptlController.transform.up), 4); //Gets the nearest point to entityOffset along the portal's right vector
 
         float a = pointOnPlane.x / ptlController.transform.right.x;            //Distance along portal.right vector pointOnPlane sits
         a = (a == 0) ? (pointOnPlane.y / ptlController.transform.right.y) : a; //If X- axis returned 0, find the Y-axis value.
@@ -227,9 +238,7 @@ public class EntityMotor : EntityRayManager
     void GetTraceThroughPortal(ref int _depth, Vector3 _position)
     {
         if ((int)Mathf.Sign(GetPortalPassDistance(_position)) != entitySideOfPortal) //If _position is on the opposite side of the portal as the entity at the start of tick
-        {
             _depth = ptlController.GetNextIndex(cinfo.worldIndex, reversePortalCycle);
-        }
     }
 
     private void CheckEntityPassedThroughPortal() //Checks if the entity has moved from one side of the portal to the other
@@ -241,6 +250,7 @@ public class EntityMotor : EntityRayManager
 
     protected virtual void EntityPassedThroughPortal()
     {
+        reversePortalCycle = !reversePortalCycle;
         int tmpindex = cinfo.worldIndex;
         ptlController.EntityPassPortal(this.gameObject.tag, ref tmpindex, reversePortalCycle);
         cinfo.worldIndex = tmpindex;

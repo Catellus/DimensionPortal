@@ -64,7 +64,8 @@ public class PortalController : MonoBehaviour
         }
         else
         {
-            print(_entityTag + " has passed through " + this.gameObject.name);
+            int prev = GetNextIndex((int)_worldIndex, !_reverseCycle);
+            print(_entityTag + " has passed through " + this.gameObject.name + " from " + prev + " to " + _worldIndex);
         }
     }
 

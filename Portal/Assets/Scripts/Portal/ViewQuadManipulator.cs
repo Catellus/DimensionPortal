@@ -4,7 +4,6 @@ using ToolBox;
 
 public class ViewQuadManipulator : MonoBehaviour
 {
-
     public PortalController portal;
     MeshFilter vFilter;
 
@@ -13,7 +12,6 @@ public class ViewQuadManipulator : MonoBehaviour
     RenderTexture vTexture;
 
     Transform viewAnchor;
-
     int viewIndex;
 
     int[] cwIndices = {
@@ -37,6 +35,9 @@ public class ViewQuadManipulator : MonoBehaviour
     Vector2 portalTopLocal, portalBottomLocal; //Local positions of the top/bottom of the portal
     Vector2 topSlope, bottomSlope;             //Slope from the camera to portal top/bottom
 
+    float pxWid;
+    float pxHei;
+
     public void Initialize(Material _mat)
     {
         vCam = portal.viewCam;
@@ -50,19 +51,19 @@ public class ViewQuadManipulator : MonoBehaviour
         Shader.SetGlobalTexture("_MainTex", vTexture);
 
         viewAnchor = this.transform;
+
+        pxWid = vCam.pixelWidth;
+        pxHei = vCam.pixelHeight;
     }
 
-    public void UpdateView(Vector3 _camPosition, bool _reverseCycle)
+    public void UpdateView(Vector3 _camPosition, int _worldIndex, bool _reverseCycle)
     {
-        viewIndex = portal.GetNextIndex((int)_camPosition.z + 1, _reverseCycle);
+        viewIndex = portal.GetNextIndex(_worldIndex, !_reverseCycle);
         this.transform.position = MoveToZ(_camPosition, viewIndex - 1);
 
-        float width  = vCam.pixelWidth;
-        float height = vCam.pixelHeight;
-
-        Vector3 wRT = vCam.ScreenToWorldPoint(new Vector2(width, height));
-        Vector3 wRB = vCam.ScreenToWorldPoint(new Vector2(width, 0     ));
-        Vector3 wLT = vCam.ScreenToWorldPoint(new Vector2(0    , height));
+        Vector3 wRT = vCam.ScreenToWorldPoint(new Vector2(pxWid, pxHei));
+        Vector3 wRB = vCam.ScreenToWorldPoint(new Vector2(pxWid, 0     ));
+        Vector3 wLT = vCam.ScreenToWorldPoint(new Vector2(0    , pxHei));
         Vector3 wLB = vCam.ScreenToWorldPoint(new Vector2(0    , 0     ));
 
         cRT = viewAnchor.InverseTransformPoint(wRT);
@@ -79,7 +80,9 @@ public class ViewQuadManipulator : MonoBehaviour
         topSlope    = portalTopLocal.normalized;
         bottomSlope = portalBottomLocal.normalized;
 
-        bool useCCW = System.Math.Round(portal.transform.InverseTransformPoint(viewAnchor.position).x, 4) < 0;
+        //bool useCCW = System.Math.Round(portal.transform.InverseTransformPoint(viewAnchor.position).x, 4) < 0;
+        //bool useCCW = MathTools.RoundVector3(portal.transform.InverseTransformPoint(viewAnchor.position), 4).x < 0;
+        bool useCCW = !_reverseCycle;
 
         MakeQuad(useCCW);
 

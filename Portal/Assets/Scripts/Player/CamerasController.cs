@@ -10,7 +10,7 @@ public class CamerasController : MonoBehaviour
 
     Camera mainCam;               //Camera that is always active (Does not see into other worlds)
 
-    public float smoothingTime = 0.1f; //Time it takes for the camera to re-centre itself
+    public float smoothingTime = 0.1f; //Time it takes for the camera to re-center itself
     Vector2 smoothingVelocity = Vector2.zero;
 
     List<GameObject> visiblePortals = new List<GameObject>();
@@ -28,20 +28,22 @@ public class CamerasController : MonoBehaviour
         player.SetNearestPortal();
     }
 
-    private void LateUpdate()
-    {
-        foreach (GameObject g in visiblePortals)
-        {
-            g.GetComponent<PortalController>().viewQuad.UpdateView(this.transform.position, player.reversePortalCycle);
-        }
-    }
-
     private void FixedUpdate()
     {
-        float distToPortal = ((player.transform.position - player.ptlController.transform.position).magnitude - player.ptlController.worldSwitchDistance) / 3;
-        float smoothAmmount = Mathf.Lerp(0, smoothingTime, distToPortal);
-        this.transform.position = SmoothFollowSnapZ(smoothAmmount);
+        //float distToPortal = ((player.transform.position - player.ptlController.transform.position).magnitude - player.ptlController.worldSwitchDistance) / 3;
+        //float smoothAmmount = Mathf.Lerp(0, smoothingTime, distToPortal);
+        //this.transform.position = SmoothFollowSnapZ(smoothAmmount);
+        this.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 1);
+
+        foreach (GameObject g in visiblePortals)
+            g.GetComponent<PortalController>().viewQuad.UpdateView(this.transform.position, player.cinfo.worldIndex, player.reversePortalCycle);
     }
+
+    //private void LateUpdate()
+    //{
+    //    foreach (GameObject g in visiblePortals)
+    //        g.GetComponent<PortalController>().viewQuad.UpdateView(this.transform.position, player.reversePortalCycle);
+    //}
 
     bool DetermineIsPortalVisible(GameObject p, int index)
     {
@@ -76,6 +78,7 @@ public class CamerasController : MonoBehaviour
                 pc.viewQuad = go.AddComponent<ViewQuadManipulator>();
                 pc.viewQuad.portal = pc;
                 pc.viewQuad.Initialize(viewMaterial);
+                //pc.viewQuad.viewAnchor = this.transform;
             }
             else
                 pc.viewCam.gameObject.SetActive(true);
@@ -92,7 +95,8 @@ public class CamerasController : MonoBehaviour
 
     Vector3 SmoothFollowSnapZ(float _smoothTime) // Smooths X and Y movement, snaps to Z positions (World switching)
     {
-        Vector3 end = Vector2.SmoothDamp(this.transform.position, player.transform.position, ref smoothingVelocity, _smoothTime);
+        //Vector3 end = Vector2.SmoothDamp(this.transform.position, player.transform.position, ref smoothingVelocity, _smoothTime);
+        Vector3 end = this.transform.position;
         end.z = player.transform.position.z - 1;
         return end;
     }

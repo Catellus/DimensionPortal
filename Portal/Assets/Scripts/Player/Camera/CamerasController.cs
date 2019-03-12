@@ -9,6 +9,7 @@ public class CamerasController : MonoBehaviour
     public Material viewMaterial; //Material on the view mesh that displays the portal's next world
 
     Camera mainCam;               //Camera that is always active (Does not see into other worlds)
+    CameraSettingsEditor camSettings;
 
     public float smoothingTime = 0.1f; //Time it takes for the camera to re-center itself
     Vector2 smoothingVelocity = Vector2.zero;
@@ -23,6 +24,8 @@ public class CamerasController : MonoBehaviour
 
         if (!player)
             player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        if (!camSettings)
+            camSettings = this.gameObject.GetComponent<CameraSettingsEditor>();
 
         player.AdditionalPortalTest = DetermineIsPortalVisible;
         player.SetNearestPortal();
@@ -36,7 +39,10 @@ public class CamerasController : MonoBehaviour
         this.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 1);
 
         foreach (GameObject g in visiblePortals)
+        {
             g.GetComponent<PortalController>().viewQuad.UpdateView(this.transform.position, player.cinfo.worldIndex, player.reversePortalCycle);
+            g.GetComponent<PortalController>().viewCam.GetComponent<CameraSettingsEditor>().FindWorldCameraSettings(player.cinfo.worldIndex);
+        }
     }
 
     //private void LateUpdate()
@@ -79,6 +85,8 @@ public class CamerasController : MonoBehaviour
                 pc.viewQuad.portal = pc;
                 pc.viewQuad.Initialize(viewMaterial);
                 //pc.viewQuad.viewAnchor = this.transform;
+
+                go.AddComponent<CameraSettingsEditor>().portalController = pc;
             }
             else
                 pc.viewCam.gameObject.SetActive(true);
@@ -101,7 +109,13 @@ public class CamerasController : MonoBehaviour
         return end;
     }
 
+    public void UpdateSettings(int _newIndex)
+    {
+        int viewIndex    = player.ptlController.accessableWorldIndices.IndexOf(_newIndex);
+        string worldName = player.ptlController.accessableWorldNames[viewIndex];
 
+        camSettings.FindWorldCameraSettings(worldName);
+    }
 
     private void OnDrawGizmos()
     {

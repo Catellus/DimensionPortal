@@ -7,17 +7,17 @@ using UnityEngine;
 public class PortalsManager : MonoBehaviour
 {
 
-    public List<PortalController> loadedPortals;
+    public List<PortalController> loadedPortals;            // List of portals in every loaded scene
 
-    public List<string> loadedWorlds = new List<string>();
+    public List<string> loadedWorlds = new List<string>();  // List of the names of all loaded worlds
 
-    private void OnEnable()
+    private void OnEnable()     // When this script loads, have "ArrangeSceneOnZ" automatically called when a scene has loaded
     {
-        SceneManager.sceneLoaded += ArrangeScene;
+        SceneManager.sceneLoaded += ArrangeSceneOnZ;
     }
-    private void OnDisable()
+    private void OnDisable()    // When this script unloads, remove "ArrangeSceneOnZ" from automatically being called when a scene has loaded
     {
-        SceneManager.sceneLoaded -= ArrangeScene;
+        SceneManager.sceneLoaded -= ArrangeSceneOnZ;
     }
 
     public void Start()
@@ -26,7 +26,7 @@ public class PortalsManager : MonoBehaviour
         UpdateLoadedWorlds();
     }
 
-    public void UpdatePortalsList()
+    public void UpdatePortalsList()     // Finds all portals currently loaded, adds its controller to "loadedPortals"
     {
         loadedPortals.Clear();
 
@@ -35,23 +35,23 @@ public class PortalsManager : MonoBehaviour
                 loadedPortals.Add(taggedObject.GetComponent<PortalController>());
     }
 
-    public void UpdateLoadedWorlds()
+    public void UpdateLoadedWorlds()    // Loads all worlds that all currently loaded portals want to access
     {
         List<string> worldLoadRequests = new List<string>();
 
-        worldLoadRequests.Add("PlayerAndPortal");
+        worldLoadRequests.Add("PlayerAndPortal");   // Ensures that "PlayerAndPortal" is accounted for and does not get overridden/deleted
 
         foreach (var p in loadedPortals)
         {
             foreach (string s in p.accessableWorldNames)
             {
-                worldLoadRequests.Add(s);
+                worldLoadRequests.Add(s);       // For each loaded portal, add the names of its requested worlds
             }
         }
 
         loadedWorlds.Clear();
 
-        foreach (string s in worldLoadRequests)
+        foreach (string s in worldLoadRequests)     // Loads each world requested
         {
             if (SceneManager.GetSceneByName(s).name == null)
             {
@@ -60,14 +60,14 @@ public class PortalsManager : MonoBehaviour
             loadedWorlds.Add(s);
         }
 
-        for (int i = 0; i < SceneManager.sceneCount; i++)
+        for (int i = 0; i < SceneManager.sceneCount; i++)   // Removes loaded worlds not in the load request
         {
             if (!loadedWorlds.Contains(SceneManager.GetSceneAt(i).name))
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(i));
         }
 
-        loadedWorlds.Remove("PlayerAndPortal");
-        foreach (var p in loadedPortals)
+        loadedWorlds.Remove("PlayerAndPortal");     // Removed to prevent "PlayerAndPortal" scene from being accessed by portal
+        foreach (var p in loadedPortals)            // For each loaded portal: Set the world indices (Z positions) of its requested worlds
         {
             p.accessableWorldIndices.Clear();
             foreach (string s in p.accessableWorldNames)
@@ -78,7 +78,7 @@ public class PortalsManager : MonoBehaviour
         loadedWorlds.Insert(0, "PlayerAndPortal");
     }
 
-    void ArrangeScene(Scene scene, LoadSceneMode mode)
+    void ArrangeSceneOnZ(Scene scene, LoadSceneMode mode)   // Moves the root objects of the scene to its worldIndex
     {
         foreach (GameObject go in scene.GetRootGameObjects())
         {
@@ -89,12 +89,15 @@ public class PortalsManager : MonoBehaviour
         }
     }
 
-    public void MoveAllPortalsToIndex(int newIndex)
+    public void MoveAllPortalsToIndex(int newIndex)     // When player moves to a new world, move all applicable portals with them
     {
         foreach (var portal in loadedPortals)
         {
             if (portal.accessableWorldIndices.Contains(newIndex))
+            {
                 portal.transform.position = new Vector3(portal.transform.position.x, portal.transform.position.y, newIndex);
+                
+            }
         }
     }
 

@@ -4,15 +4,16 @@ using ToolBox;
 
 public class ViewQuadManipulator : MonoBehaviour
 {
-    public PortalController portal;
-    MeshFilter vFilter;
+    public PortalController portal;     // Portal this quad is "looking through"
+           MeshFilter       vFilter;    // 
 
-    Camera vCam;
-    Mesh vMesh;
+    Camera        vCam;
+    Mesh          vMesh;
     RenderTexture vTexture;
 
-    Transform viewAnchor;
+    Transform  viewAnchor;
     int viewIndex;
+    public bool reverseCycle;
 
     int[] cwIndices = {
     0, 1, 2, //FOV A
@@ -35,8 +36,8 @@ public class ViewQuadManipulator : MonoBehaviour
     Vector2 portalTopLocal, portalBottomLocal; //Local positions of the top/bottom of the portal
     Vector2 topSlope, bottomSlope;             //Slope from the camera to portal top/bottom
 
-    float pxWid;
-    float pxHei;
+    float pxWidth;      // Window width  in pixels
+    float pxHeight;     // Window height in pixels
 
     public void Initialize(Material _mat)
     {
@@ -52,27 +53,28 @@ public class ViewQuadManipulator : MonoBehaviour
 
         viewAnchor = this.transform;
 
-        pxWid = vCam.pixelWidth;
-        pxHei = vCam.pixelHeight;
+        pxWidth = vCam.pixelWidth;
+        pxHeight = vCam.pixelHeight;
     }
 
     public void UpdateView(Vector3 _camPosition, int _worldIndex, bool _reverseCycle)
     {
+        reverseCycle = _reverseCycle;
         viewIndex = portal.GetNextIndex(_worldIndex, !_reverseCycle);
         this.transform.position = MoveToZ(_camPosition, viewIndex - 1);
 
-        Vector3 wRT = vCam.ScreenToWorldPoint(new Vector2(pxWid, pxHei));
-        Vector3 wRB = vCam.ScreenToWorldPoint(new Vector2(pxWid, 0     ));
-        Vector3 wLT = vCam.ScreenToWorldPoint(new Vector2(0    , pxHei));
-        Vector3 wLB = vCam.ScreenToWorldPoint(new Vector2(0    , 0     ));
+        Vector3 wRT = vCam.ScreenToWorldPoint(new Vector2(pxWidth, pxHeight )); // Window Right - Top
+        Vector3 wRB = vCam.ScreenToWorldPoint(new Vector2(pxWidth, 0        )); // Window Right - Bottom
+        Vector3 wLT = vCam.ScreenToWorldPoint(new Vector2(0      , pxHeight )); // Window Left  - Top
+        Vector3 wLB = vCam.ScreenToWorldPoint(new Vector2(0      , 0        )); // Window Left  - Bottom
 
-        cRT = viewAnchor.InverseTransformPoint(wRT);
-        cRB = viewAnchor.InverseTransformPoint(wRB);
-        cLT = viewAnchor.InverseTransformPoint(wLT);
-        cLB = viewAnchor.InverseTransformPoint(wLB);
+        cRT = viewAnchor.InverseTransformPoint(wRT);    // World location of corner to relative location
+        cRB = viewAnchor.InverseTransformPoint(wRB);    // World location of corner to relative location
+        cLT = viewAnchor.InverseTransformPoint(wLT);    // World location of corner to relative location
+        cLB = viewAnchor.InverseTransformPoint(wLB);    // World location of corner to relative location
 
-        Vector2 portalTopWorld    = portal.transform.TransformPoint(new Vector2(0,  portal.portalHalfHeight));
-        Vector2 portalBottomWorld = portal.transform.TransformPoint(new Vector2(0, -portal.portalHalfHeight));
+        Vector2 portalTopWorld    = portal.transform.TransformPoint(new Vector2(0,  portal.portalHalfHeight)); // Relative position to world
+        Vector2 portalBottomWorld = portal.transform.TransformPoint(new Vector2(0, -portal.portalHalfHeight)); // Relative position to world
 
         portalTopLocal    = viewAnchor.InverseTransformPoint(portalTopWorld   );
         portalBottomLocal = viewAnchor.InverseTransformPoint(portalBottomWorld);

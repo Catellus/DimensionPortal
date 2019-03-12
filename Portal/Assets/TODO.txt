@@ -1,4 +1,5 @@
 
 DONE (181011) - Added (181011)  - Add ability to see into other worlds
-TODO          - Added (181011)  - Add camera settings scriptable object to automatically update cameras that enter that world's index (clear color, post process, etc)
-TODO          - Added (181011)  - Fix world switching timing; currently will change worlds before the view mesh is flipped over the portal (camera system's fault?)
+DONE (190311) - Added (181011)  - Add camera settings scriptable object to automatically update cameras that enter that world's index (clear color, post process, etc)
+Done?(190311) - Added (181011)  - Fix world switching timing; currently will change worlds before the view mesh is flipped over the portal (camera system's fault?) NOTE: Did not notice this occurring during this commit
+TODO          - Added (190311)  - untangle the code; Add better managers

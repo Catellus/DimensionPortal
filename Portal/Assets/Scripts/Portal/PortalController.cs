@@ -16,14 +16,27 @@ public class PortalController : MonoBehaviour
     public float portalHalfHeight    = 1f;
 
     [Space(10)]
-    public Camera viewCam;               //Camera that sees into this portal's next world
-    public RenderTexture viewTexture;    //Texture the ViewCam renders to
-    public ViewQuadManipulator viewQuad; //Edits the view mesh based on player location
+    public Camera               viewCam;                //Camera that sees into this portal's next world
+    public CameraSettingsEditor viewCamSettingsEditor;  // 
+    public RenderTexture        viewTexture;            //Texture the ViewCam renders to
+    public ViewQuadManipulator  viewQuad;               //Edits the view mesh based on player location
 
 
     private void Start()
     {
         viewTexture = new RenderTexture(Screen.width, Screen.height, 0);
+    }
+
+    public string GetWorldNameFromNextIndex(int _curIndex, bool _reverseCycle)
+    {
+        int nextIndex = GetNextIndex(_curIndex, _reverseCycle);
+        return GetWorldNameFromIndex(nextIndex);
+    }
+
+    public string GetWorldNameFromIndex(int _index)
+    {
+        _index = accessableWorldIndices.IndexOf(_index);
+        return accessableWorldNames[_index];
     }
 
     public int GetNextIndex(int _curIndex, bool _reverseCycle) //Make able to do ping pong cycle?
@@ -54,10 +67,10 @@ public class PortalController : MonoBehaviour
         }
     }
 
-    public void EntityPassPortal(string _entityTag, ref int _worldIndex, bool _reverseCycle)
+    public void EntityPassedThroughPortal(string _entityTag, ref int _worldIndex, bool _reverseCycle)
     {
         _worldIndex = GetNextIndex((int)_worldIndex, _reverseCycle);
-
+    
         if (_entityTag == "Player")
         {
             manager.MoveAllPortalsToIndex(_worldIndex);

@@ -5,9 +5,9 @@ public class EntityMotor : EntityRayManager
 {
     #region Variables
     //[Space, Header("EntityMotor")]
-    private float distanceToPortalCenter = 100; //Entity's distance to the portal's position
-    private int entitySideOfPortal;             //Portal relative X direction the entity lies
-    public bool reversePortalCycle = false;
+    private float distanceToPortalCenter = 100  ;   //Entity's distance to the portal's position
+    private int   entitySideOfPortal            ;   //Portal relative X direction the entity lies
+    public  bool  reversePortalCycle     = false;
 
     #endregion
 
@@ -28,7 +28,7 @@ public class EntityMotor : EntityRayManager
         {
             distanceToPortalCenter = ((Vector2)this.transform.position - (Vector2)ptlController.transform.position).magnitude;
             entitySideOfPortal = (int)Mathf.Sign(GetPortalPassDistance(this.transform.position));
-            reversePortalCycle = entitySideOfPortal == 1;
+            reversePortalCycle = entitySideOfPortal == -1;
         }
 
         if (_ammount != Vector2.zero)
@@ -220,7 +220,7 @@ public class EntityMotor : EntityRayManager
 
 
 //========================\\
-//// PORTAL INTERACTION \\\\
+//   PORTAL INTERACTION   \\
 //========================\\
 
     public float GetPortalPassDistance(Vector2 _location) //Gets the distance along the portal's right vector _location resides
@@ -250,10 +250,8 @@ public class EntityMotor : EntityRayManager
 
     protected virtual void EntityPassedThroughPortal()
     {
-        reversePortalCycle = !reversePortalCycle;
-        int tmpindex = cinfo.worldIndex;
-        ptlController.EntityPassPortal(this.gameObject.tag, ref tmpindex, reversePortalCycle);
-        cinfo.worldIndex = tmpindex;
+        reversePortalCycle = !reversePortalCycle; // Here to prevent scene flashing when switching worlds (I have no idea why this works)
+        ptlController.EntityPassedThroughPortal(this.gameObject.tag, ref cinfo.worldIndex, !reversePortalCycle);
         this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, cinfo.worldIndex);
     }
 

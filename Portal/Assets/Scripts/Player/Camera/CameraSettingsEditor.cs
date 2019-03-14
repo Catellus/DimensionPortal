@@ -5,25 +5,7 @@ using UnityEngine;
 public class CameraSettingsEditor : MonoBehaviour
 {
     public Camera cam;
-    public PortalController portalController;
-
     public so_CameraSettings currentSettings;
-
-    private void Start()
-    {
-        cam = this.gameObject.GetComponent<Camera>();
-    }
-
-    public void FindWorldCameraSettings(int _inIndex)
-    {
-        bool reverse = portalController.viewCam.gameObject.GetComponent<ViewQuadManipulator>().reverseCycle;
-        int viewIndex = portalController.GetNextIndex(_inIndex, !reverse);
-        int worldIndex= portalController.accessableWorldIndices.IndexOf(viewIndex);
-        string name = portalController.accessableWorldNames[worldIndex];
-
-        FindWorldCameraSettings(name);
-
-    }
 
     public void FindWorldCameraSettings(string _worldName)
     {
@@ -36,8 +18,8 @@ public class CameraSettingsEditor : MonoBehaviour
         if (!cam)
             cam = this.gameObject.GetComponent<Camera>();
 
+        cam.backgroundColor = _inSettings.clearColor;
         currentSettings = _inSettings;
-        cam.backgroundColor = currentSettings.clearColor;
     }
 
 }

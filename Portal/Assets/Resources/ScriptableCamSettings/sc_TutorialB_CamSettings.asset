@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b37a571cffc447049b8f8eb72736a6c1, type: 3}
-  m_Name: sc_TutorialA_CamSettings
+  m_Name: sc_TutorialB_CamSettings
   m_EditorClassIdentifier: 
-  clearColor: {r: 0.7169812, g: 0.36187258, b: 0.37484673, a: 1}
+  clearColor: {r: 0.26383945, g: 0.46226418, b: 0.2748092, a: 1}

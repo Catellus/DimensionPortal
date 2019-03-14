@@ -6,7 +6,7 @@ public class PlayerController : EntityMotor
     #region Variables
 
     //[HideInInspector] 
-    public CamerasController camController;
+    public pl_CameraController camController;
 
     [Space, Header("Controller - Movement")]
     public bool  bUseDebugYMovement;      //DEBUG: Toggles gravity usage
@@ -48,7 +48,7 @@ public class PlayerController : EntityMotor
         m_currentMaxWalkSpeed = maxWalkSpeed;
         DetermineJumpForces();
         if (!camController)
-            camController = this.gameObject.GetComponent<CamerasController>();
+            camController = this.gameObject.GetComponent<pl_CameraController>();
     }
 
     //Determines the risingGravity and jumpVelocities based on jumpHeights and jumpTime
@@ -62,6 +62,8 @@ public class PlayerController : EntityMotor
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.O))
+            bUseDebugYMovement = !bUseDebugYMovement;
         HandleInput();
     }
 
@@ -124,7 +126,6 @@ public class PlayerController : EntityMotor
     {
         base.EntityPassedThroughPortal();
         camController.UpdateSettings(cinfo.worldIndex);
-        //ptlController.viewQuad.UpdateView(camController.transform.position ,reversePortalCycle);
     }
 
     #region Input Functions

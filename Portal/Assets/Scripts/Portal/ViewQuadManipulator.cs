@@ -13,7 +13,7 @@ public class ViewQuadManipulator : MonoBehaviour
 
     Transform  viewAnchor;
     int viewIndex;
-    public bool reverseCycle;
+    public float viewOffset = 0.01f;
 
     int[] cwIndices = {
     0, 1, 2, //FOV A
@@ -59,8 +59,7 @@ public class ViewQuadManipulator : MonoBehaviour
 
     public void UpdateView(Vector3 _camPosition, int _worldIndex, bool _reverseCycle)
     {
-        reverseCycle = _reverseCycle;
-        viewIndex = portal.GetNextIndex(_worldIndex, !_reverseCycle);
+        viewIndex = portal.GetNextIndex(_worldIndex, _reverseCycle);
         this.transform.position = MoveToZ(_camPosition, viewIndex - 1);
 
         Vector3 wRT = vCam.ScreenToWorldPoint(new Vector2(pxWidth, pxHeight )); // Window Right - Top
@@ -84,7 +83,7 @@ public class ViewQuadManipulator : MonoBehaviour
 
         //bool useCCW = System.Math.Round(portal.transform.InverseTransformPoint(viewAnchor.position).x, 4) < 0;
         //bool useCCW = MathTools.RoundVector3(portal.transform.InverseTransformPoint(viewAnchor.position), 4).x < 0;
-        bool useCCW = !_reverseCycle;
+        bool useCCW = _reverseCycle;
 
         MakeQuad(useCCW);
 
@@ -121,7 +120,7 @@ public class ViewQuadManipulator : MonoBehaviour
         viewVerts[4] = v4;
         viewVerts[5] = v5;
 
-        float localPositionOfVisibleWorld = (int)viewAnchor.InverseTransformPoint(portal.transform.position).z - 0.45f;
+        float localPositionOfVisibleWorld = (int)viewAnchor.InverseTransformPoint(portal.transform.position).z - viewOffset;
         for(int i = 0; i < 6; i++)
         { viewVerts[i] = MoveToZ(viewVerts[i], localPositionOfVisibleWorld); }
     }

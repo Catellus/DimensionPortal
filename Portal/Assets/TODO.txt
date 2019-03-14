@@ -2,4 +2,5 @@
 DONE (181011) - Added (181011)  - Add ability to see into other worlds
 DONE (190311) - Added (181011)  - Add camera settings scriptable object to automatically update cameras that enter that world's index (clear color, post process, etc)
 Done?(190311) - Added (181011)  - Fix world switching timing; currently will change worlds before the view mesh is flipped over the portal (camera system's fault?) NOTE: Did not notice this occurring during this commit
-TODO          - Added (190311)  - untangle the code; Add better managers
+WIP  (190313) - Added (190311)  - untangle the code; Add better managers
+TODO          - Added (190313)  - Edit ViewQuadManipulator to morph the quad based on player position not playerCamera position. (Will need to adjust quad's relative position as its position is relative to camera.)

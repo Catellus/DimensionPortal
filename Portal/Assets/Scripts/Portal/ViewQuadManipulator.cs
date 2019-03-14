@@ -57,7 +57,7 @@ public class ViewQuadManipulator : MonoBehaviour
         pxHeight = vCam.pixelHeight;
     }
 
-    public void UpdateView(Vector3 _camPosition, int _worldIndex, bool _reverseCycle)
+    public void UpdateView(Vector3 _camPosition, Vector3 _playerPosition, int _worldIndex, bool _reverseCycle)
     {
         viewIndex = portal.GetNextIndex(_worldIndex, _reverseCycle);
         this.transform.position = MoveToZ(_camPosition, viewIndex - 1);
@@ -78,14 +78,15 @@ public class ViewQuadManipulator : MonoBehaviour
         portalTopLocal    = viewAnchor.InverseTransformPoint(portalTopWorld   );
         portalBottomLocal = viewAnchor.InverseTransformPoint(portalBottomWorld);
 
-        topSlope    = portalTopLocal.normalized;
-        bottomSlope = portalBottomLocal.normalized;
+        //topSlope    = portalTopLocal.normalized;
+        topSlope    = (portalTopWorld    - (Vector2)_playerPosition).normalized;
+        bottomSlope = (portalBottomWorld - (Vector2)_playerPosition).normalized;
 
         //bool useCCW = System.Math.Round(portal.transform.InverseTransformPoint(viewAnchor.position).x, 4) < 0;
         //bool useCCW = MathTools.RoundVector3(portal.transform.InverseTransformPoint(viewAnchor.position), 4).x < 0;
         bool useCCW = _reverseCycle;
 
-        MakeQuad(useCCW);
+        MakeQuad(useCCW, viewAnchor.InverseTransformPoint(_playerPosition));
 
         vMesh.vertices = viewVerts;
         vMesh.triangles = useCCW ? ccwIndices : cwIndices;
@@ -97,15 +98,15 @@ public class ViewQuadManipulator : MonoBehaviour
         vFilter.sharedMesh = vMesh;
     }
 
-    void MakeQuad(bool _useCCW)
+    void MakeQuad(bool _useCCW, Vector2 _playerPosition)
     {
         int topHitSide = 0;
         int bottomHitSide = 0;
 
         viewVerts[0] = portalTopLocal;
         viewVerts[1] = portalBottomLocal;
-        viewVerts[2] = FindScreenIntersections(Vector2.zero, bottomSlope, ref bottomHitSide);
-        viewVerts[3] = FindScreenIntersections(Vector2.zero, topSlope   , ref topHitSide   );
+        viewVerts[2] = FindScreenIntersections(_playerPosition, bottomSlope, ref bottomHitSide);
+        viewVerts[3] = FindScreenIntersections(_playerPosition, topSlope   , ref topHitSide   );
 
         if (viewVerts[3].magnitude < portalTopLocal.magnitude)
             viewVerts[3] = portalTopLocal;

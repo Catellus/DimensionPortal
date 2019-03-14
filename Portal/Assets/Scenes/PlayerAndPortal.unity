@@ -496,7 +496,7 @@ MonoBehaviour:
   reversePortalCycle: 0
   camController: {fileID: 114074184130269503}
   bUseDebugYMovement: 1
-  maxWalkSpeed: 6
+  maxWalkSpeed: 8
   accelerationTime: 0.1
   maxJumpHeight: 3.5
   minJumpHeight: 0.5
@@ -519,7 +519,7 @@ MonoBehaviour:
   currentSettings: {fileID: 0}
   player: {fileID: 114035877837330022}
   viewMaterial: {fileID: 2100000, guid: def09018dc20d164faa5ab3f4638c96c, type: 2}
-  smoothingTime: 1
+  smoothingTime: 0.25
 --- !u!114 &114125935306717518
 MonoBehaviour:
   m_ObjectHideFlags: 0

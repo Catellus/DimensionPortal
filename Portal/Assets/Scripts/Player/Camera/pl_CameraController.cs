@@ -31,18 +31,18 @@ public class pl_CameraController : CameraSettingsEditor
 
         foreach (PortalController ptl in visiblePortals)
         {
-            ptl.viewQuad.UpdateView(this.transform.position, player.cinfo.worldIndex, player.reversePortalCycle);
+            ptl.viewQuad.UpdateView(this.transform.position, player.transform.position, player.cinfo.worldIndex, player.reversePortalCycle);
             ptl.viewCamSettingsEditor.FindWorldCameraSettings(ptl.GetWorldNameFromNextIndex(player.cinfo.worldIndex, player.reversePortalCycle));
         }
     }
 
     void HandleMovement()
     {
-        //float distToPortal = ((player.transform.position - portalController.transform.position).magnitude - portalController.worldSwitchDistance) / 5;
-        //Debug.Log(distToPortal);
+        //float distToPortal = ((player.transform.position - player.ptlController.transform.position).magnitude - player.ptlController.worldSwitchDistance) / 5;
         //float smoothAmmount = Mathf.Lerp(0, smoothingTime, distToPortal);
         //this.transform.position = SmoothFollowSnapZ(smoothAmmount);
-        this.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 1);
+        this.transform.position = SmoothFollowSnapZ(smoothingTime);
+        //this.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 1);
     }
 
     Vector3 SmoothFollowSnapZ(float _smoothTime) // Smooths X and Y movement, snaps to Z positions (World switching)

@@ -4,7 +4,7 @@ using ToolBox;
 
 public class ViewQuadManipulator : MonoBehaviour
 {
-    public PortalController portal;     // Portal this quad is "looking through"
+    public PortalController ptlController;     // Portal this quad is "looking through"
            MeshFilter       vFilter;    // 
 
     Camera        vCam;
@@ -41,7 +41,7 @@ public class ViewQuadManipulator : MonoBehaviour
 
     public void Initialize(Material _mat)
     {
-        vCam = portal.viewCam;
+        vCam = ptlController.viewCam;
         vTexture = new RenderTexture(vCam.pixelWidth, vCam.pixelHeight, 0);
         vCam.targetTexture = vTexture;
 
@@ -57,9 +57,9 @@ public class ViewQuadManipulator : MonoBehaviour
         pxHeight = vCam.pixelHeight;
     }
 
-    public void UpdateView(Vector3 _camPosition, Vector3 _playerPosition, int _worldIndex, bool _reverseCycle)
+    public void UpdateView(Vector3 _camPosition, Vector3 _playerPosition, int _worldIndex, bool _useCCW)
     {
-        viewIndex = portal.GetNextIndex(_worldIndex, _reverseCycle);
+        viewIndex = ptlController.GetNextIndex(_worldIndex, _useCCW);
         this.transform.position = MoveToZ(_camPosition, viewIndex - 1);
 
         Vector3 wRT = vCam.ScreenToWorldPoint(new Vector2(pxWidth, pxHeight )); // Window Right - Top
@@ -72,8 +72,8 @@ public class ViewQuadManipulator : MonoBehaviour
         cLT = viewAnchor.InverseTransformPoint(wLT);    // World location of corner to relative location
         cLB = viewAnchor.InverseTransformPoint(wLB);    // World location of corner to relative location
 
-        Vector2 portalTopWorld    = portal.transform.TransformPoint(new Vector2(0,  portal.portalHalfHeight)); // Relative position to world
-        Vector2 portalBottomWorld = portal.transform.TransformPoint(new Vector2(0, -portal.portalHalfHeight)); // Relative position to world
+        Vector2 portalTopWorld    = ptlController.transform.TransformPoint(new Vector2(0,  ptlController.portalHalfHeight)); // Relative position to world
+        Vector2 portalBottomWorld = ptlController.transform.TransformPoint(new Vector2(0, -ptlController.portalHalfHeight)); // Relative position to world
 
         portalTopLocal    = viewAnchor.InverseTransformPoint(portalTopWorld   );
         portalBottomLocal = viewAnchor.InverseTransformPoint(portalBottomWorld);
@@ -84,12 +84,11 @@ public class ViewQuadManipulator : MonoBehaviour
 
         //bool useCCW = System.Math.Round(portal.transform.InverseTransformPoint(viewAnchor.position).x, 4) < 0;
         //bool useCCW = MathTools.RoundVector3(portal.transform.InverseTransformPoint(viewAnchor.position), 4).x < 0;
-        bool useCCW = _reverseCycle;
 
-        MakeQuad(useCCW, viewAnchor.InverseTransformPoint(_playerPosition));
+        MakeQuad(viewAnchor.InverseTransformPoint(_playerPosition));
 
         vMesh.vertices = viewVerts;
-        vMesh.triangles = useCCW ? ccwIndices : cwIndices;
+        vMesh.triangles = _useCCW ? ccwIndices : cwIndices;
 
         vMesh.uv = new Vector2[vMesh.vertices.Length];
         vMesh.RecalculateNormals();
@@ -98,7 +97,7 @@ public class ViewQuadManipulator : MonoBehaviour
         vFilter.sharedMesh = vMesh;
     }
 
-    void MakeQuad(bool _useCCW, Vector2 _playerPosition)
+    void MakeQuad(Vector2 _playerPosition)
     {
         int topHitSide = 0;
         int bottomHitSide = 0;
@@ -116,12 +115,12 @@ public class ViewQuadManipulator : MonoBehaviour
         Vector2 v4 = viewVerts[2];
         Vector2 v5 = viewVerts[3];
 
-        GetPositionBasedOnHitSides(topHitSide, bottomHitSide, _useCCW, ref v4, ref v5);
+        GetPositionBasedOnHitSides(topHitSide, bottomHitSide, viewAnchor.transform.TransformPoint(_playerPosition), ref v4, ref v5);
 
         viewVerts[4] = v4;
         viewVerts[5] = v5;
 
-        float localPositionOfVisibleWorld = (int)viewAnchor.InverseTransformPoint(portal.transform.position).z - viewOffset;
+        float localPositionOfVisibleWorld = (int)viewAnchor.InverseTransformPoint(ptlController.transform.position).z - viewOffset;
         for(int i = 0; i < 6; i++)
         { viewVerts[i] = MoveToZ(viewVerts[i], localPositionOfVisibleWorld); }
     }
@@ -167,10 +166,12 @@ public class ViewQuadManipulator : MonoBehaviour
         }
     }
 
-    void GetPositionBasedOnHitSides(int _topHit, int _bottomHit, bool _inverse, ref Vector2 v4, ref Vector2 v5)
+    void GetPositionBasedOnHitSides(int _topHit, int _bottomHit, Vector3 _playerPosition, ref Vector2 v4, ref Vector2 v5)
     {
-        int bothHit = _topHit + _bottomHit;
+        Vector3 playerPlanarOffset  = Vector3.ProjectOnPlane(_playerPosition - ptlController.transform.position, ptlController.transform.up);
+        Vector2 playerRoundedOffset = MathTools.RoundVector3(playerPlanarOffset, 4);
 
+        int bothHit = _topHit + _bottomHit;
         switch (bothHit)
         {
                                                 // 1  == (Impossible) Only one intersection
@@ -180,7 +181,7 @@ public class ViewQuadManipulator : MonoBehaviour
                 break;
                                                 // 4  == Both Left (Already set to top/bottom intersection position)
             case 5:                             // 5  == One Top One Bottom
-                if (_inverse)
+                if (playerRoundedOffset.x < 0)
                 { //If player is left of the portal
                     v5 = (_topHit    == 1) ? cRT : cRB; //Is top    hitting Screen Top?
                     v4 = (_bottomHit == 4) ? cRB : cRT; //Is bottom hitting Screen Bottom?
@@ -200,7 +201,7 @@ public class ViewQuadManipulator : MonoBehaviour
                 v4 = v5 = cRT;
                 break;
             case 10:                            // 10 == One Left One Right
-                if (_inverse)
+                if (playerRoundedOffset.y < 0)
                 { //If player is below the portal
                     v5 = (_topHit    == 2) ? cLT : cRT; //Is top    hitting Screen Left?
                     v4 = (_bottomHit == 8) ? cRT : cLT; //Is bottom hitting Screen Right?

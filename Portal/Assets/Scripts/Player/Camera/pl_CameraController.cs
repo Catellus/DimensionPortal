@@ -10,7 +10,7 @@ public class pl_CameraController : CameraSettingsEditor
 
     List<PortalController> visiblePortals = new List<PortalController>();
 
-    public float smoothingTime = 0.1f; //Time it takes for the camera to re-center itself
+    public float smoothingTime = 0.25f; //Time it takes for the camera to re-center itself
     Vector2 screenTopRight, screenBottomLeft, smoothingVelocity = Vector2.zero;
 
     public void Start()
@@ -29,18 +29,15 @@ public class pl_CameraController : CameraSettingsEditor
     {
         HandleMovement();
 
-        foreach (PortalController ptl in visiblePortals)
+        foreach (PortalController pc in visiblePortals)
         {
-            ptl.viewQuad.UpdateView(this.transform.position, player.transform.position, player.cinfo.worldIndex, player.reversePortalCycle);
-            ptl.viewCamSettingsEditor.FindWorldCameraSettings(ptl.GetWorldNameFromNextIndex(player.cinfo.worldIndex, player.reversePortalCycle));
+            pc.viewQuad.UpdateView(this.transform.position, player.transform.position, player.cinfo.worldIndex, player.reversePortalCycle);
+            pc.viewCamSettingsEditor.FindWorldCameraSettings(pc.GetWorldNameFromNextIndex(player.cinfo.worldIndex, player.reversePortalCycle));
         }
     }
 
     void HandleMovement()
     {
-        //float distToPortal = ((player.transform.position - player.ptlController.transform.position).magnitude - player.ptlController.worldSwitchDistance) / 5;
-        //float smoothAmmount = Mathf.Lerp(0, smoothingTime, distToPortal);
-        //this.transform.position = SmoothFollowSnapZ(smoothAmmount);
         this.transform.position = SmoothFollowSnapZ(smoothingTime);
         //this.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 1);
     }
@@ -90,7 +87,7 @@ public class pl_CameraController : CameraSettingsEditor
                 pc.viewCam.orthographicSize = base.cam.orthographicSize;
 
                 pc.viewQuad = go.AddComponent<ViewQuadManipulator>();
-                pc.viewQuad.portal = pc;
+                pc.viewQuad.ptlController = pc;
                 pc.viewQuad.Initialize(viewMaterial);
                 //pc.viewQuad.viewAnchor = this.transform;
 

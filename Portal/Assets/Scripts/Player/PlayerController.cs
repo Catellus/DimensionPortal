@@ -64,6 +64,8 @@ public class PlayerController : EntityMotor
     {
         if (Input.GetKeyDown(KeyCode.O))
             bUseDebugYMovement = !bUseDebugYMovement;
+        if (Input.GetKeyDown(KeyCode.I))
+            ptlController.manager.UpdateLoadedWorlds();
         HandleInput();
     }
 

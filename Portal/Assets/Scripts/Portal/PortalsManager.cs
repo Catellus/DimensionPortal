@@ -7,9 +7,9 @@ using UnityEngine;
 public class PortalsManager : MonoBehaviour
 {
 
-    public List<PortalController> loadedPortals;            // List of portals in every loaded scene
+    public List<PortalController> loadedPortals;                        // List of portals in every loaded scene
+    public List<string>           loadedWorlds = new List<string>();    // List of the names of all loaded worlds
 
-    public List<string> loadedWorlds = new List<string>();  // List of the names of all loaded worlds
 
     private void OnEnable()     // When this script loads, have "ArrangeSceneOnZ" automatically called when a scene has loaded
     {

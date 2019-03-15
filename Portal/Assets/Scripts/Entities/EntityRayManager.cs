@@ -68,7 +68,7 @@ public class EntityRayManager : MonoBehaviour
 
     public void SetNearestPortal()
     {
-        PortalController tmpClosest = ptlController;
+        PortalController tempNearestPortal = ptlController;
         float tmpDistance = float.MaxValue;
 
         int index = 0;
@@ -82,13 +82,13 @@ public class EntityRayManager : MonoBehaviour
                     if (pc && pc.GetNextIndex(cinfo.worldIndex, false) != cinfo.worldIndex)
                     {
                         tmpDistance = (p.transform.position - this.transform.position).magnitude;
-                        tmpClosest = pc;
+                        tempNearestPortal = pc;
                     }
                 }
             }
             index++;
         }
-        ptlController = tmpClosest;
+        ptlController = tempNearestPortal;
     }
 
     public void DetermineRaySpacing() //Gets ray counts and spacing based om raySpacing

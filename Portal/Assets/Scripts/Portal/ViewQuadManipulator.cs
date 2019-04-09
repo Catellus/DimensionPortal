@@ -11,9 +11,10 @@ public class ViewQuadManipulator : MonoBehaviour
     Mesh          vMesh;
     RenderTexture vTexture;
 
-    Transform  viewAnchor;
-    int viewIndex;
+    Transform    viewAnchor;
+    int          viewIndex;
     public float viewOffset = 0.01f;
+    Vector2 entityOffset;
 
     int[] cwIndices = {
     0, 1, 2, //FOV A
@@ -57,9 +58,9 @@ public class ViewQuadManipulator : MonoBehaviour
         pxHeight = vCam.pixelHeight;
     }
 
-    public void UpdateView(Vector3 _camPosition, Vector3 _playerPosition, int _worldIndex, bool _useCCW)
+    public void UpdateView(Vector3 _camPosition, Vector3 _entityPosition, int _worldIndex)
     {
-        viewIndex = ptlController.GetNextIndex(_worldIndex, _useCCW);
+        viewIndex = ptlController.GetNextIndex(_worldIndex, GetEntitySide(_entityPosition));
         this.transform.position = MoveToZ(_camPosition, viewIndex - 1);
 
         Vector3 wRT = vCam.ScreenToWorldPoint(new Vector2(pxWidth, pxHeight )); // Window Right - Top
@@ -78,23 +79,29 @@ public class ViewQuadManipulator : MonoBehaviour
         portalTopLocal    = viewAnchor.InverseTransformPoint(portalTopWorld   );
         portalBottomLocal = viewAnchor.InverseTransformPoint(portalBottomWorld);
 
-        //topSlope    = portalTopLocal.normalized;
-        topSlope    = (portalTopWorld    - (Vector2)_playerPosition).normalized;
-        bottomSlope = (portalBottomWorld - (Vector2)_playerPosition).normalized;
+        topSlope    = (portalTopWorld    - (Vector2)_entityPosition).normalized;
+        bottomSlope = (portalBottomWorld - (Vector2)_entityPosition).normalized;
 
-        //bool useCCW = System.Math.Round(portal.transform.InverseTransformPoint(viewAnchor.position).x, 4) < 0;
-        //bool useCCW = MathTools.RoundVector3(portal.transform.InverseTransformPoint(viewAnchor.position), 4).x < 0;
-
-        MakeQuad(viewAnchor.InverseTransformPoint(_playerPosition));
-
-        vMesh.vertices = viewVerts;
-        vMesh.triangles = _useCCW ? ccwIndices : cwIndices;
+        MakeQuad(viewAnchor.InverseTransformPoint(_entityPosition));
+        vMesh.vertices  = viewVerts;
+        vMesh.triangles = (GetEntitySide(_entityPosition)) ? ccwIndices : cwIndices;
 
         vMesh.uv = new Vector2[vMesh.vertices.Length];
         vMesh.RecalculateNormals();
         vMesh.RecalculateBounds();
 
         vFilter.sharedMesh = vMesh;
+    }
+
+    private bool GetEntitySide(Vector3 _entityPosition)
+    {
+        Vector3 entityPlanarOffset = Vector3.ProjectOnPlane(_entityPosition - ptlController.transform.position, ptlController.transform.up);
+        Vector2 entityRoundedOffset = MathTools.RoundVector3(entityPlanarOffset, 4);
+
+        float a = entityRoundedOffset.x / ptlController.transform.right.x;            //Distance along portal.right vector pointOnPlane sits
+        a = (a == 0) ? (entityRoundedOffset.y / ptlController.transform.right.y) : a;
+
+        return (float)System.Math.Round(a, 4) < 0; //Rounds the value to 4 decimal places
     }
 
     void MakeQuad(Vector2 _playerPosition)
@@ -166,10 +173,10 @@ public class ViewQuadManipulator : MonoBehaviour
         }
     }
 
-    void GetPositionBasedOnHitSides(int _topHit, int _bottomHit, Vector3 _playerPosition, ref Vector2 v4, ref Vector2 v5)
+    void GetPositionBasedOnHitSides(int _topHit, int _bottomHit, Vector3 _entityPosition, ref Vector2 v4, ref Vector2 v5)
     {
-        Vector3 playerPlanarOffset  = Vector3.ProjectOnPlane(_playerPosition - ptlController.transform.position, ptlController.transform.up);
-        Vector2 playerRoundedOffset = MathTools.RoundVector3(playerPlanarOffset, 4);
+        Vector3 entityPlanarOffset = Vector3.ProjectOnPlane(_entityPosition - ptlController.transform.position, ptlController.transform.up);
+        Vector2 entityRoundedOffset = MathTools.RoundVector3(entityPlanarOffset, 4);
 
         int bothHit = _topHit + _bottomHit;
         switch (bothHit)
@@ -181,7 +188,7 @@ public class ViewQuadManipulator : MonoBehaviour
                 break;
                                                 // 4  == Both Left (Already set to top/bottom intersection position)
             case 5:                             // 5  == One Top One Bottom
-                if (playerRoundedOffset.x < 0)
+                if (entityRoundedOffset.x < 0)
                 { //If player is left of the portal
                     v5 = (_topHit    == 1) ? cRT : cRB; //Is top    hitting Screen Top?
                     v4 = (_bottomHit == 4) ? cRB : cRT; //Is bottom hitting Screen Bottom?
@@ -201,7 +208,7 @@ public class ViewQuadManipulator : MonoBehaviour
                 v4 = v5 = cRT;
                 break;
             case 10:                            // 10 == One Left One Right
-                if (playerRoundedOffset.y < 0)
+                if (entityRoundedOffset.y < 0)
                 { //If player is below the portal
                     v5 = (_topHit    == 2) ? cLT : cRT; //Is top    hitting Screen Left?
                     v4 = (_bottomHit == 8) ? cRT : cLT; //Is bottom hitting Screen Right?

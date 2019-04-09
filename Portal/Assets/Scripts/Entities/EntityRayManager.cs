@@ -54,6 +54,8 @@ public class EntityRayManager : MonoBehaviour
     public SwappablePortalTests AdditionalPortalTest;
     public EntityRayManager() { AdditionalPortalTest = (GameObject p, int i) => { return true; }; }
 
+    public bool DEBUG_showDraws;
+
     #endregion //Variables
 
     public virtual void Start()
@@ -89,6 +91,7 @@ public class EntityRayManager : MonoBehaviour
             index++;
         }
         ptlController = tempNearestPortal;
+        GetNewNearestPortalSide();
     }
 
     public void DetermineRaySpacing() //Gets ray counts and spacing based om raySpacing
@@ -117,9 +120,11 @@ public class EntityRayManager : MonoBehaviour
         rayOrigins.bottomLeft  = center + (Vector2)(collisionRotation * new Vector2(-extents.x, -extents.y)); //Turns relative location into world position
     }
 
+    protected virtual void GetNewNearestPortalSide() {}
+
     private void OnDrawGizmos()
     {
-        if (Application.isPlaying)
+        if (Application.isPlaying && DEBUG_showDraws)
         {
             Gizmos.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(Vector3.zero), Vector3.one); //Resets gizmo rotation to world
             Gizmos.color = Color.red;                         //Draw red     Top    Left  sphere

@@ -31,7 +31,7 @@ public class pl_CameraController : CameraSettingsEditor
 
         foreach (PortalController pc in visiblePortals)
         {
-            pc.viewQuad.UpdateView(this.transform.position, player.transform.position, player.cinfo.worldIndex, player.reversePortalCycle);
+            pc.viewQuad.UpdateView(this.transform.position, player.transform.position, player.cinfo.worldIndex);
             pc.viewCamSettingsEditor.FindWorldCameraSettings(pc.GetWorldNameFromNextIndex(player.cinfo.worldIndex, player.reversePortalCycle));
         }
     }
@@ -67,6 +67,7 @@ public class pl_CameraController : CameraSettingsEditor
 
         PortalController pc = p.GetComponent<PortalController>();
         float halfHeight = pc.portalHalfHeight;
+
 
         Vector2 topPos    = p.transform.TransformPoint(new Vector2(0,  halfHeight));
         Vector2 bottomPos = p.transform.TransformPoint(new Vector2(0, -halfHeight));

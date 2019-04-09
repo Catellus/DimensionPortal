@@ -27,7 +27,6 @@ public class StartInformation : MonoBehaviour
         foreach (portalSpawnInformation spawn in portalSpawns)
         {
             PortalController portal = Instantiate(portalPrefab, spawn.startLocation, Quaternion.Euler(spawn.startRotation)).GetComponent<PortalController>();
-            Debug.LogWarning("SPAWNED a portal");
 
             string name = "";
             foreach (string world in spawn.levelNames)

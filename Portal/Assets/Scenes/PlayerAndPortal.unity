@@ -148,18 +148,23 @@ MonoBehaviour:
   - levelNames:
     - TEST_A
     - TEST_B
-    startLocation: {x: 1, y: 1, z: 0}
-    startRotation: {x: 0, y: 0, z: 45}
+    startLocation: {x: 1, y: 11, z: 0}
+    startRotation: {x: 0, y: 0, z: 0}
   - levelNames:
     - TEST_A
     - TEST_B
-    startLocation: {x: -1, y: 1, z: 0}
-    startRotation: {x: 0, y: 0, z: -45}
+    startLocation: {x: 1, y: 8, z: 0}
+    startRotation: {x: 0, y: 0, z: 180}
   - levelNames:
     - TEST_A
     - TEST_B
-    startLocation: {x: 0, y: 0, z: 0}
+    startLocation: {x: -1, y: 11.5, z: 0}
     startRotation: {x: 0, y: 0, z: 90}
+  - levelNames:
+    - TEST_A
+    - TEST_B
+    startLocation: {x: -1, y: 8.5, z: 0}
+    startRotation: {x: 0, y: 0, z: -90}
   playerStartLocation: {x: 0, y: 0, z: 0}
 --- !u!4 &1099521348
 Transform:
@@ -307,6 +312,11 @@ PrefabInstance:
       propertyPath: camController
       value: 
       objectReference: {fileID: 114074184130269503}
+    - target: {fileID: 6777527431795122628, guid: 849ec64f12984a34bbc698e174775fbd,
+        type: 3}
+      propertyPath: entityHeight
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6777577288455442156, guid: 849ec64f12984a34bbc698e174775fbd,
         type: 3}
       propertyPath: DEBUG_breakit
@@ -315,12 +325,12 @@ PrefabInstance:
     - target: {fileID: 6887287909997266712, guid: 849ec64f12984a34bbc698e174775fbd,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6887287909997266712, guid: 849ec64f12984a34bbc698e174775fbd,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 6887287909997266712, guid: 849ec64f12984a34bbc698e174775fbd,
         type: 3}

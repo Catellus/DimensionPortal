@@ -4,10 +4,10 @@ using ToolBox;
 public class EntityMotor : EntityRayManager
 {
     #region Variables
-    //[Space, Header("EntityMotor")]
-    private float distanceToPortalCenter = 100  ;   //Entity's distance to the portal's position
-    private int   entitySideOfPortal            ;   //Portal relative X direction the entity lies
-    public  bool  reversePortalCycle     = false;
+    [Space, Header("EntityMotor")]
+    public bool reversePortalCycle = false;
+    private float distanceToPortalCenter = 100;   //Entity's distance to the portal's position
+    private int entitySideOfPortal;   //Portal relative X direction the entity lies
 
     #endregion
 
@@ -58,7 +58,7 @@ public class EntityMotor : EntityRayManager
 
     #region Collision
 
-//// HORIZONTAL COLLISION \\\\
+    //// HORIZONTAL COLLISION \\\\
     public void CheckHorizontalCollision(ref Vector2 _ammount)
     {
         int direction = cinfo.facingDirection;
@@ -78,7 +78,7 @@ public class EntityMotor : EntityRayManager
                 GetTraceThroughPortal(ref tmpDepth, origin);
 
             RaycastHit2D hit = Physics2D.Raycast(origin, testRotation, rayLength, collisionMask | detectionMask, tmpDepth, tmpDepth);
-            Debug.DrawRay(origin, testRotation, Color.blue);
+            if (DEBUG_showDraws) Debug.DrawRay(origin, testRotation, Color.blue);
 
             if (hit)
                 if (HorizontalHitInteraction(hit, testRotation, direction, rayLength, ref _ammount) == -1)
@@ -104,8 +104,8 @@ public class EntityMotor : EntityRayManager
                         return -1;
 
                 _ammount.x = ((_hit.distance + throughHit.distance) - skinBuffer) * _direction; //Let entity move only the combined distance of the traces
-                cinfo.left  = _direction == -1;
-                cinfo.right = _direction ==  1;
+                cinfo.left = _direction == -1;
+                cinfo.right = _direction == 1;
             }
         }
         else if (isCollider)
@@ -115,14 +115,14 @@ public class EntityMotor : EntityRayManager
                     return -1;
 
             _ammount.x = (_hit.distance - skinBuffer) * _direction; //Let entity move only the distance of the trace
-            cinfo.left  = _direction == -1;
-            cinfo.right = _direction ==  1;
+            cinfo.left = _direction == -1;
+            cinfo.right = _direction == 1;
         }
         return 0;
     }
 
 
-//// VERTICAL COLLISION \\\\
+    //// VERTICAL COLLISION \\\\
     public void CheckVerticalCollision(ref Vector2 _ammount)
     {
 
@@ -147,7 +147,7 @@ public class EntityMotor : EntityRayManager
                 GetTraceThroughPortal(ref tmpDepth, origin);
 
             RaycastHit2D hit = Physics2D.Raycast(origin, testRotation, rayLength, collisionMask | detectionMask, tmpDepth, tmpDepth);
-            Debug.DrawRay(origin, testRotation, Color.red);
+            if (DEBUG_showDraws) Debug.DrawRay(origin, testRotation, Color.red);
 
             if (hit)
                 if (VerticalHitInteraction(hit, testRotation, direction, rayLength, ref _ammount) == -1)
@@ -169,7 +169,7 @@ public class EntityMotor : EntityRayManager
             {
                 _ammount.y = ((_hit.distance + throughHit.distance) - skinBuffer) * _direction; //Let entity move only the combined distance of the traces
                 cinfo.below = _direction == -1;
-                cinfo.above = _direction ==  1;
+                cinfo.above = _direction == 1;
             }
         }
         else if (isCollider)
@@ -180,7 +180,7 @@ public class EntityMotor : EntityRayManager
 
             _ammount.y = (_hit.distance - skinBuffer) * _direction; //Let entity move only the distance of the trace
             cinfo.below = _direction == -1;
-            cinfo.above = _direction ==  1;
+            cinfo.above = _direction == 1;
         }
         return 0;
     }
@@ -213,15 +213,15 @@ public class EntityMotor : EntityRayManager
 
         #endregion
 
-        Debug.DrawRay(leftOrigin, collisionRotation * (Vector2.down), Color.green);
-        Debug.DrawRay(rightOrigin, collisionRotation * (Vector2.down), Color.white);
+        if (DEBUG_showDraws) Debug.DrawRay(leftOrigin, collisionRotation * (Vector2.down), Color.green);
+        if (DEBUG_showDraws) Debug.DrawRay(rightOrigin, collisionRotation * (Vector2.down), Color.white);
     }
 
 
 
-//========================\\
-//   PORTAL INTERACTION   \\
-//========================\\
+    //========================\\
+    //   PORTAL INTERACTION   \\
+    //========================\\
 
     public float GetPortalPassDistance(Vector2 _location) //Gets the distance along the portal's right vector _location resides
     {
@@ -253,6 +253,12 @@ public class EntityMotor : EntityRayManager
         reversePortalCycle = !reversePortalCycle; // Here to prevent scene flashing when switching worlds (I have no idea why this works)
         ptlController.EntityPassedThroughPortal(this.gameObject.tag, ref cinfo.worldIndex, !reversePortalCycle);
         this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, cinfo.worldIndex);
+    }
+
+    protected override void GetNewNearestPortalSide()
+    {
+        entitySideOfPortal = (int)Mathf.Sign(GetPortalPassDistance(this.transform.position));
+        reversePortalCycle = entitySideOfPortal == -1;
     }
 
     #endregion

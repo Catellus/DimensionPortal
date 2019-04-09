@@ -184,5 +184,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 809c3b37e7ac57042960a17ed69e3ed7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DEBUG_breakit: 1
   loadedPortals: []
   loadedWorlds: []

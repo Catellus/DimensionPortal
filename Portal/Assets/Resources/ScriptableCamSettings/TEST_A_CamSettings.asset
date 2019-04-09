@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b37a571cffc447049b8f8eb72736a6c1, type: 3}
   m_Name: TEST_A_CamSettings
   m_EditorClassIdentifier: 
-  backgroundColor: {r: 0.6320754, g: 0.04472231, b: 0.5279851, a: 1}
+  backgroundColor: {r: 0.14978638, g: 0.6226415, b: 0.3164925, a: 1}

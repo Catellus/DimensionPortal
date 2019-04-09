@@ -46,11 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
-  accessableWorldNames:
-  - TEST_A
-  - TEST_B
-  - sc_TutorialA
-  - sc_TutorialB
+  accessableWorldNames: []
   accessableWorldIndices: 
   worldLoadDistance: 15
   worldSwitchDistance: 0.85
@@ -59,6 +55,7 @@ MonoBehaviour:
   viewCamSettingsEditor: {fileID: 0}
   viewTexture: {fileID: 0}
   viewQuad: {fileID: 0}
+  DEBUG_ShowGizmos: 1
 --- !u!61 &6731895456908514413
 BoxCollider2D:
   m_ObjectHideFlags: 0

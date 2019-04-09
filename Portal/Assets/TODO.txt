@@ -1,13 +1,29 @@
-DONE (181011) - Added (181011) - Add ability to see into other worlds
-DONE (190311) - Added (181011) - Add camera settings scriptable object to automatically update cameras that enter that world's index (clear color, post process, etc)
-Done?(190311) - Added (181011) - Fix world switching timing; currently will change worlds before the view mesh is flipped over the portal (camera system's fault?) NOTE: Did not notice this occurring during this commit
-Done?(190314) - Added (190311) - untangle the code; Add better managers NOTE: Only edited camera scripts. Should return to this later.
-Done (190314) - Added (190313) - Edit ViewQuadManipulator to morph the quad based on player position not playerCamera position. (Will need to adjust quad's relative position as its position is relative to camera.)
-TODO          - Added (190314) - "Funnel" player into center of portal when passing through it
-TODO          - Added (190314) - Add player ability to place the portal (Maybe on cursor position with ability to rotate with mouse wheel?)
-Done (190314) - Added (190314) - Fix viewQuad fill when portal is at -90 degrees on Z NOTE: Replaced _useCCW with a planar offset from earlier build (version shown to Valve)
-TODO          - Added (190314) - Add infrastructre to allow objects' visuals to morph when passing through a portal (only part of its body visible in the new/old world)
-TODO          - Added (190314) - Allow multiple portals to be on-screen at one time
-TODO          - Added (190314) - Handle stacking portal-views (viewing portals through portals)
+TODO            - Added (190314)    - Figure out an actual game mechanic
 
-TODO          - Added (190314) - Figure out an actual game mechanic
+    ///// MISC \\\\\
+
+Done?(190314)   - Added (190311)    - untangle the code; Add better managers -- NOTE: Only edited camera scripts. Should return to this later.
+
+
+    ///// CAMERAS & PORTAL VIEW \\\\\
+
+DONE (181011)   - Added (181011)    - Add ability to see into other worlds
+DONE (190311)   - Added (181011)    - Add camera settings scriptable object to automatically update cameras that enter that world's index (clear color, post process, etc)
+Done (190314)   - Added (190313)    - Edit ViewQuadManipulator to morph the quad based on player position not playerCamera position. (Will need to adjust quad's relative position as its position is relative to camera.)
+Done (190314)   - Added (190314)    - Fix viewQuad fill when portal is at -90 degrees on Z -- NOTE: Replaced _useCCW with a planar offset from earlier build (version shown to Valve)
+TODO            - Added (190314)    - Allow multiple portals to be on-screen at one time -- NOTE: Player side detection very unstable with multiple portals near each other
+TODO            - Added (190314)    - Handle stacking portal-views (viewing portals through portals)
+TODO            - Added (190408)    - Batch portal view textures // When multiple portals see into the same world, have them use the same camera
+
+
+    ///// PORTAL MECHANICS \\\\\
+
+Done?(190311)   - Added (181011)    - Fix world switching timing; currently will change worlds before the view mesh is flipped over the portal (camera system's fault?) -- NOTE: Did not notice this occurring during this commit
+TODO            - Added (190314)    - "Funnel" player into center of portal when passing through it
+TODO            - Added (190314)    - Add player ability to place the portal (Maybe on cursor position with ability to rotate with mouse wheel?)
+TODO            - Added (190314)    - Add infrastructre to allow objects' visuals to morph when passing through a portal (only part of its body visible in the new/old world) STENCILS!!
+
+
+    ///// PLAYER MECHANICS \\\\\
+
+TODO            - Added (190408)    - Add object interaction

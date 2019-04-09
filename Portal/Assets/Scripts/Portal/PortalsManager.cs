@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class PortalsManager : MonoBehaviour
 {
-
     public List<PortalController> loadedPortals;                        // List of portals in every loaded scene
     public List<string>           loadedWorlds = new List<string>();    // List of the names of all loaded worlds
 
@@ -63,7 +62,10 @@ public class PortalsManager : MonoBehaviour
         for (int i = 0; i < SceneManager.sceneCount; i++)   // Removes loaded worlds not in the load request
         {
             if (!loadedWorlds.Contains(SceneManager.GetSceneAt(i).name))
+            {
+                Debug.LogError("Unloading: " + SceneManager.GetSceneAt(i).name);
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(i));
+            }
         }
 
         loadedWorlds.Remove("PlayerAndPortal");     // Removed to prevent "PlayerAndPortal" scene from being accessed by portal

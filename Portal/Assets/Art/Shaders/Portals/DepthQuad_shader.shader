@@ -1,4 +1,4 @@
-﻿Shader "Unlit/sh_Depth"
+﻿Shader "Unlit/DepthQuad_shader"
 {
     SubShader
     {
@@ -12,7 +12,6 @@
             ColorMask 0
 
             CGPROGRAM
-            #pragma multi_compile_instancing
             #pragma vertex vert
             #pragma fragment frag
 

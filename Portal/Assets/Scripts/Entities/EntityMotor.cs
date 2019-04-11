@@ -5,9 +5,9 @@ public class EntityMotor : EntityRayManager
 {
     #region Variables
     [Space, Header("EntityMotor")]
-    public bool reversePortalCycle = false;
-    private float distanceToPortalCenter = 100;   //Entity's distance to the portal's position
-    private int entitySideOfPortal;   //Portal relative X direction the entity lies
+    public  bool  reversePortalCycle     = false; // Dictates which direction the portal will transport the entity
+    private float distanceToPortalCenter = 100;   // Entity's distance to the portal's position
+    private int   entitySideOfPortal;             // Portal relative X direction the entity lies
 
     #endregion
 
@@ -27,8 +27,8 @@ public class EntityMotor : EntityRayManager
         if (ptlController != null)
         {
             distanceToPortalCenter = ((Vector2)this.transform.position - (Vector2)ptlController.transform.position).magnitude;
-            entitySideOfPortal = (int)Mathf.Sign(GetPortalPassDistance(this.transform.position));
-            reversePortalCycle = entitySideOfPortal == -1;
+            entitySideOfPortal     = (int)Mathf.Sign(GetPortalPassDistance(this.transform.position));
+            reversePortalCycle     = entitySideOfPortal == -1;
         }
 
         if (_ammount != Vector2.zero)
@@ -103,8 +103,8 @@ public class EntityMotor : EntityRayManager
                     if (HandlePermeablePlatform() == -1) //If the entity collides with a "permeable" platform, handle it in its script
                         return -1;
 
-                _ammount.x = ((_hit.distance + throughHit.distance) - skinBuffer) * _direction; //Let entity move only the combined distance of the traces
-                cinfo.left = _direction == -1;
+                _ammount.x  = ((_hit.distance + throughHit.distance) - skinBuffer) * _direction; //Let entity move only the combined distance of the traces
+                cinfo.left  = _direction == -1;
                 cinfo.right = _direction == 1;
             }
         }
@@ -114,8 +114,8 @@ public class EntityMotor : EntityRayManager
                 if (HandlePermeablePlatform() == -1) //If the entity collides with a "permeable" platform, handle it in its script
                     return -1;
 
-            _ammount.x = (_hit.distance - skinBuffer) * _direction; //Let entity move only the distance of the trace
-            cinfo.left = _direction == -1;
+            _ammount.x  = (_hit.distance - skinBuffer) * _direction; //Let entity move only the distance of the trace
+            cinfo.left  = _direction == -1;
             cinfo.right = _direction == 1;
         }
         return 0;

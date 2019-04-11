@@ -1,8 +1,8 @@
-﻿Shader "Unlit/PortalStencil_TEST_Unlit"
+﻿Shader "Unlit/ViewQuad_shader"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        [PerRendererData]_QuadViewTexture("Texture", 2D) = "white" {}
     }
     SubShader
     {
@@ -14,42 +14,41 @@
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
+            #include "UnityStandardUtils.cginc"
 
-            struct appdata
+            struct VertIn
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
             };
 
-            struct v2f
+            struct FragIn
             {
                 float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(1)
+                float3 screen_uv : TEXCOORD1;
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+            sampler2D _QuadViewTexture;
 
-            v2f vert (appdata v)
+            FragIn vert (VertIn v)
             {
-                v2f o;
+                FragIn o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
+                //o.vertex.z = 0;
+                o.uv = v.uv;
+                o.screen_uv = float3((o.vertex.xy + o.vertex.w) * 0.5, o.vertex.w);
+
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag (FragIn i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
+                float2 screen_uv = i.screen_uv.xy / i.screen_uv.z;
+                fixed4 col = tex2D(_QuadViewTexture, screen_uv);
                 return col;
             }
             ENDCG

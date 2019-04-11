@@ -13,7 +13,9 @@ DONE (190314)   - Added (190313)    - Edit ViewQuadManipulator to morph the quad
 DONE (190314)   - Added (190314)    - Fix viewQuad fill when portal is at -90 degrees on Z -- NOTE: Replaced _useCCW with a planar offset from earlier build (version shown to Valve)
 DONE (190408)   - Added (190314)    - Allow multiple portals to be on-screen at one time -- NOTE: Player side detection very unstable with multiple portals near each other
 TODO            - Added (190314)    - Handle stacking portal-views (viewing portals through portals)
-TODO !!!        - Added (190408)    - Batch portal view textures // When multiple portals see into the same world, have them use the same camera
+TODO !!!        - Added (190408)    - Batch portal view textures (When multiple portals see into the same world, have them use the same camera)
+DONE (190411)   - Added (190410)    - Have portals see into different worlds simultaniously. (Also now only render what the view sees to the render texture [Still loads the whole world though])
+TODO            - Added (190411)    - Cull all parts of other worlds that are invisible to player (Frustrum culling using the viewQuads)
 
 
     ///// PORTAL MECHANICS \\\\\

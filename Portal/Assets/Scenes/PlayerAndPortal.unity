@@ -148,24 +148,14 @@ MonoBehaviour:
   - levelNames:
     - TEST_A
     - TEST_B
-    startLocation: {x: 1, y: 11, z: 0}
+    - sc_TutorialA
+    startLocation: {x: 1, y: 7.1, z: 0}
     startRotation: {x: 0, y: 0, z: 0}
   - levelNames:
     - TEST_A
     - TEST_B
-    startLocation: {x: 1, y: 8, z: 0}
-    startRotation: {x: 0, y: 0, z: 180}
-  - levelNames:
-    - TEST_A
-    - TEST_B
-    startLocation: {x: -1, y: 11.5, z: 0}
-    startRotation: {x: 0, y: 0, z: 90}
-  - levelNames:
-    - TEST_A
-    - TEST_B
-    startLocation: {x: -1, y: 8.5, z: 0}
-    startRotation: {x: 0, y: 0, z: -90}
-  playerStartLocation: {x: 0, y: 0, z: 0}
+    startLocation: {x: 1, y: 5, z: 0}
+    startRotation: {x: 0, y: 0, z: 0}
 --- !u!4 &1099521348
 Transform:
   m_ObjectHideFlags: 0
@@ -233,6 +223,11 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 114035877837330022}
+    - target: {fileID: 1793177082715121010, guid: 97f0271c0bb654441acd9ca1cee57c9b,
+        type: 3}
+      propertyPath: depthMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 921781a4db2494d4aa1159c16ae87fe2, type: 2}
     - target: {fileID: 1830607726021718752, guid: 97f0271c0bb654441acd9ca1cee57c9b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -377,5 +372,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6889309291974089066, guid: 849ec64f12984a34bbc698e174775fbd,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 849ec64f12984a34bbc698e174775fbd, type: 3}

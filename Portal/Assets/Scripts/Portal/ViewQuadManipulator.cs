@@ -1,61 +1,81 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 using ToolBox;
 
 
 public class ViewQuadManipulator : MonoBehaviour
 {
-    public PortalController ptlController;     // Portal this quad is "looking through"
-           MeshFilter       vFilter;    // 
+#region Variables
+    public  PortalController ptlController; // Portal this quad is "looking through"
+    private MeshFilter       vFilter;
 
-    Camera        vCam;
-    Mesh          vMesh;
-    RenderTexture vTexture;
+    private Camera        vCam;
+    private Mesh          vMesh;
+    private Renderer      vRenderer;
+    private RenderTexture vTexture;
 
-    Transform    viewAnchor;
-    int          viewIndex;
-    public float viewOffset = 0.01f;
-    Vector2 entityOffset;
+    public  float     viewOffset = 0.01f; // Currently used to put the view quad behind the portal and player, but above the environment
+    private int       viewIndex;
+    private Vector2   entityOffset;
+    private Transform viewAnchor;
 
-    int[] cwIndices = {
+    //Has inverted normals from cwIndices so the quad is visible at all times
+    private int[] ccwIndices = {
+    0, 2, 1, //FOV A
+    0, 3, 2, //FOV B
+    2, 3, 5, //FILL A
+    2, 5, 4  //FILL B
+    };
+    private int[] cwIndices  = {
     0, 1, 2, //FOV A
     0, 2, 3, //FOV B
     2, 5, 3, //FILL A
     2, 4, 5  //FILL B
     };
 
-    //Has inverted normals from cwIndices so the quad is visible at all times
-    int[] ccwIndices = {
-    0, 2, 1, //FOV A
-    0, 3, 2, //FOV B
-    2, 3, 5, //FILL A
-    2, 5, 4  //FILL B
-    };
+    private Vector3[] viewVerts = new Vector3[6];
 
-    Vector3[] viewVerts = new Vector3[6];
+    private Vector2 cornerRT, cornerRB, cornerLT, cornerLB; //Local positions of the screen's corners
+    private Vector2 portalTopLocal, portalBottomLocal;      //Local positions of the top/bottom of the portal
+    private Vector2 topSlope      , bottomSlope;            //Slope from the camera to portal top/bottom
 
-    Vector2 cRT, cRB, cLT, cLB;                //Local positions of the screen's corners
-    Vector2 portalTopLocal, portalBottomLocal; //Local positions of the top/bottom of the portal
-    Vector2 topSlope, bottomSlope;             //Slope from the camera to portal top/bottom
+    private int vCamPixelHeight, vCamPixelWidth;
 
-    float pxWidth;      // Window width  in pixels
-    float pxHeight;     // Window height in pixels
+#endregion Variables
 
-    public void Initialize(Material _mat)
+
+    public void Initialize()
     {
-        vCam = ptlController.viewCam;
-        vTexture = new RenderTexture(vCam.pixelWidth, vCam.pixelHeight, 0);
+        vCam               = ptlController.viewCam;
+        vTexture           = new RenderTexture(Screen.width, Screen.height, 24);
         vCam.targetTexture = vTexture;
 
-        vMesh = new Mesh();
-        vFilter = this.gameObject.AddComponent<MeshFilter>();
-        this.gameObject.AddComponent<MeshRenderer>().sharedMaterial = _mat;
-
-        Shader.SetGlobalTexture("_MainTex", vTexture);
-
+        vMesh      = new Mesh();
+        vFilter    = this.gameObject.AddComponent<MeshFilter>();
+        vRenderer  = this.gameObject.AddComponent<MeshRenderer>();
         viewAnchor = this.transform;
 
-        pxWidth = vCam.pixelWidth;
-        pxHeight = vCam.pixelHeight;
+        vRenderer.materials = new Material[] { new Material (Shader.Find("Unlit/ViewQuad_shader")) };
+
+        vCamPixelWidth = vCam.pixelWidth;
+        vCamPixelHeight = vCam.pixelHeight;
+
+        SetUpViewTexture();
+    }
+
+    private void SetUpViewTexture()
+    {
+        CommandBuffer depthHack = new CommandBuffer();
+        depthHack.name          = "Depth hack";
+
+        depthHack.ClearRenderTarget(true, false, Color.black, 0);
+        depthHack.DrawRenderer(vRenderer, new Material(Shader.Find("Unlit/DepthQuad_shader")));
+        vCam.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, depthHack);
+
+        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+        this.gameObject.GetComponent<MeshRenderer>().GetPropertyBlock(propBlock);
+        propBlock.SetTexture("_QuadViewTexture", vTexture);
+        this.gameObject.GetComponent<MeshRenderer>().SetPropertyBlock(propBlock);
     }
 
     public void UpdateView(Vector3 _camPosition, Vector3 _entityPosition, int _worldIndex)
@@ -63,15 +83,15 @@ public class ViewQuadManipulator : MonoBehaviour
         viewIndex = ptlController.GetNextIndex(_worldIndex, GetEntitySide(_entityPosition));
         this.transform.position = MoveToZ(_camPosition, viewIndex - 1);
 
-        Vector3 wRT = vCam.ScreenToWorldPoint(new Vector2(pxWidth, pxHeight )); // Window Right - Top
-        Vector3 wRB = vCam.ScreenToWorldPoint(new Vector2(pxWidth, 0        )); // Window Right - Bottom
-        Vector3 wLT = vCam.ScreenToWorldPoint(new Vector2(0      , pxHeight )); // Window Left  - Top
-        Vector3 wLB = vCam.ScreenToWorldPoint(new Vector2(0      , 0        )); // Window Left  - Bottom
+        Vector3 worldRT = vCam.ScreenToWorldPoint(new Vector2(vCamPixelWidth, vCamPixelHeight)); // Window Right - Top
+        Vector3 worldRB = vCam.ScreenToWorldPoint(new Vector2(vCamPixelWidth, 0              )); // Window Right - Bottom
+        Vector3 worldLT = vCam.ScreenToWorldPoint(new Vector2(0             , vCamPixelHeight)); // Window Left  - Top
+        Vector3 worldLB = vCam.ScreenToWorldPoint(new Vector2(0              , 0             )); // Window Left  - Bottom
 
-        cRT = viewAnchor.InverseTransformPoint(wRT);    // World location of corner to relative location
-        cRB = viewAnchor.InverseTransformPoint(wRB);    // World location of corner to relative location
-        cLT = viewAnchor.InverseTransformPoint(wLT);    // World location of corner to relative location
-        cLB = viewAnchor.InverseTransformPoint(wLB);    // World location of corner to relative location
+        cornerRT = viewAnchor.InverseTransformPoint(worldRT);    // World location of corner to relative location
+        cornerRB = viewAnchor.InverseTransformPoint(worldRB);    // World location of corner to relative location
+        cornerLT = viewAnchor.InverseTransformPoint(worldLT);    // World location of corner to relative location
+        cornerLB = viewAnchor.InverseTransformPoint(worldLB);    // World location of corner to relative location
 
         Vector2 portalTopWorld    = ptlController.transform.TransformPoint(new Vector2(0,  ptlController.portalHalfHeight)); // Relative position to world
         Vector2 portalBottomWorld = ptlController.transform.TransformPoint(new Vector2(0, -ptlController.portalHalfHeight)); // Relative position to world
@@ -104,7 +124,7 @@ public class ViewQuadManipulator : MonoBehaviour
         return (float)System.Math.Round(a, 4) < 0; //Rounds the value to 4 decimal places
     }
 
-    void MakeQuad(Vector2 _playerPosition)
+    private void MakeQuad(Vector2 _playerPosition)
     {
         int topHitSide = 0;
         int bottomHitSide = 0;
@@ -132,19 +152,19 @@ public class ViewQuadManipulator : MonoBehaviour
         { viewVerts[i] = MoveToZ(viewVerts[i], localPositionOfVisibleWorld); }
     }
 
-    Vector2 FindScreenIntersections(Vector2 _origin, Vector2 _slope, ref int _sideHit)
+    private Vector2 FindScreenIntersections(Vector2 _origin, Vector2 _slope, ref int _sideHit)
     {
         Vector2 result = Vector2.negativeInfinity;
 
-        TestIntersectionOfLineSegments(ref result, ref _sideHit, _origin, _slope.normalized * 100, cRT, cLT); //Top
-        TestIntersectionOfLineSegments(ref result, ref _sideHit, _origin, _slope.normalized * 100, cLT, cLB); //Left
-        TestIntersectionOfLineSegments(ref result, ref _sideHit, _origin, _slope.normalized * 100, cLB, cRB); //Bottom
-        TestIntersectionOfLineSegments(ref result, ref _sideHit, _origin, _slope.normalized * 100, cRB, cRT); //Right
+        TestIntersectionOfLineSegments(ref result, ref _sideHit, _origin, _slope.normalized * 100, cornerRT, cornerLT); //Top
+        TestIntersectionOfLineSegments(ref result, ref _sideHit, _origin, _slope.normalized * 100, cornerLT, cornerLB); //Left
+        TestIntersectionOfLineSegments(ref result, ref _sideHit, _origin, _slope.normalized * 100, cornerLB, cornerRB); //Bottom
+        TestIntersectionOfLineSegments(ref result, ref _sideHit, _origin, _slope.normalized * 100, cornerRB, cornerRT); //Right
 
         return result;
     }
 
-    void TestIntersectionOfLineSegments(ref Vector2 _result, ref int _usedSides, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) //Finds intersection of line segments
+    private void TestIntersectionOfLineSegments(ref Vector2 _result, ref int _usedSides, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) //Finds intersection of line segments
     {
         if (float.IsNegativeInfinity(_result.x)) //Ensures the _result is only set once -- each _ref passes through four times (once for each side of the screen)
         {
@@ -160,20 +180,20 @@ public class ViewQuadManipulator : MonoBehaviour
             {
                 _result = p0 + (t * s1); //Sets intersection point
 
-                if      (p2 == cRT) //If the line intersects with screen Top
+                if      (p2 == cornerRT) //If the line intersects with screen Top
                     _usedSides |= 1 << 0;        //Sets _usedSides to 1
-                else if (p2 == cLT) //If the line intersects with screen Left
+                else if (p2 == cornerLT) //If the line intersects with screen Left
                     _usedSides |= 1 << 1;        //Sets _usedSides to 2
-                else if (p2 == cLB) //If the line intersects with screen Bottom
+                else if (p2 == cornerLB) //If the line intersects with screen Bottom
                     _usedSides |= 1 << 2;        //Sets _usedSides to 4
-                else if (p2 == cRB) //If the line intersects with screen RIght
+                else if (p2 == cornerRB) //If the line intersects with screen RIght
                     _usedSides |= 1 << 3;        //Sets _usedSides to 8
 
             }
         }
     }
 
-    void GetPositionBasedOnHitSides(int _topHit, int _bottomHit, Vector3 _entityPosition, ref Vector2 v4, ref Vector2 v5)
+    private void GetPositionBasedOnHitSides(int _topHit, int _bottomHit, Vector3 _entityPosition, ref Vector2 v4, ref Vector2 v5)
     {
         Vector3 entityPlanarOffset = Vector3.ProjectOnPlane(_entityPosition - ptlController.transform.position, ptlController.transform.up);
         Vector2 entityRoundedOffset = MathTools.RoundVector3(entityPlanarOffset, 4);
@@ -184,44 +204,44 @@ public class ViewQuadManipulator : MonoBehaviour
                                                 // 1  == (Impossible) Only one intersection
                                                 // 2  == Both Top (Already set to top/bottom intersection position)
             case 3:                             // 3  == One Top One Left
-                v4 = v5 = cLT;
+                v4 = v5 = cornerLT;
                 break;
                                                 // 4  == Both Left (Already set to top/bottom intersection position)
             case 5:                             // 5  == One Top One Bottom
                 if (entityRoundedOffset.x < 0)
                 { //If player is left of the portal
-                    v5 = (_topHit    == 1) ? cRT : cRB; //Is top    hitting Screen Top?
-                    v4 = (_bottomHit == 4) ? cRB : cRT; //Is bottom hitting Screen Bottom?
+                    v5 = (_topHit    == 1) ? cornerRT : cornerRB; //Is top    hitting Screen Top?
+                    v4 = (_bottomHit == 4) ? cornerRB : cornerRT; //Is bottom hitting Screen Bottom?
                 }
                 else
                 { //If player is right of the portal
-                    v5 = (_topHit    == 1) ? cLT : cLB; //Is top    hitting Screen Top?
-                    v4 = (_bottomHit == 4) ? cLB : cLT; //Is bottom hitting Screen Bottom?
+                    v5 = (_topHit    == 1) ? cornerLT : cornerLB; //Is top    hitting Screen Top?
+                    v4 = (_bottomHit == 4) ? cornerLB : cornerLT; //Is bottom hitting Screen Bottom?
                 }
                 break;
             case 6:                             // 6  == One Left One Bottom
-                v4 = v5 = cLB;
+                v4 = v5 = cornerLB;
                 break;
                                                 // 7  == (Impossible) Three intersections
                                                 // 8  == Both Bottom (Already set to top/bottom intersection position)
             case 9:                             // 9  == One Top One Right
-                v4 = v5 = cRT;
+                v4 = v5 = cornerRT;
                 break;
             case 10:                            // 10 == One Left One Right
                 if (entityRoundedOffset.y < 0)
                 { //If player is below the portal
-                    v5 = (_topHit    == 2) ? cLT : cRT; //Is top    hitting Screen Left?
-                    v4 = (_bottomHit == 8) ? cRT : cLT; //Is bottom hitting Screen Right?
+                    v5 = (_topHit    == 2) ? cornerLT : cornerRT; //Is top    hitting Screen Left?
+                    v4 = (_bottomHit == 8) ? cornerRT : cornerLT; //Is bottom hitting Screen Right?
                 }
                 else
                 { //If player is above the portal
-                    v5 = (_topHit    == 2) ? cLB : cRB; //Is top    hitting Screen Left?
-                    v4 = (_bottomHit == 8) ? cRB : cLB; //Is bottom hitting Screen Right?
+                    v5 = (_topHit    == 2) ? cornerLB : cornerRB; //Is top    hitting Screen Left?
+                    v4 = (_bottomHit == 8) ? cornerRB : cornerLB; //Is bottom hitting Screen Right?
                 }
                 break;
                                                 // 11 == (Impossible) Three intersections
             case 12:                            // 12 == One Right One Bottom
-                v4 = v5 = cRB;
+                v4 = v5 = cornerRB;
                 break;
                                                 // 13 == (Impossible) Three intersections
                                                 // 14 == (Impossible) Three intersections
@@ -234,7 +254,7 @@ public class ViewQuadManipulator : MonoBehaviour
         }
     }
 
-    Vector3 MoveToZ(Vector2 _in, float _z = 1)
+    private Vector3 MoveToZ(Vector2 _in, float _z = 1)
     {
         return new Vector3(_in.x, _in.y, _z);
     }

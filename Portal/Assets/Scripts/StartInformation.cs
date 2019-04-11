@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class StartInformation : MonoBehaviour
 {
-    //public GameObject playerPrefab;
     public PortalsManager portalManager;
-    public GameObject portalPrefab;
+    public GameObject     portalPrefab;
 
     [System.Serializable]
     public struct portalSpawnInformation
@@ -17,12 +16,8 @@ public class StartInformation : MonoBehaviour
     }
     public List<portalSpawnInformation> portalSpawns;
 
-    public Vector3 playerStartLocation;
-
     void Start()
     {
-        //PortalsManager manager = Instantiate(playerPrefab, playerStartLocation, Quaternion.Euler(Vector3.zero)).GetComponent<PortalsManager>();
-
         int portalIndex = 0;
         foreach (portalSpawnInformation spawn in portalSpawns)
         {
@@ -38,12 +33,11 @@ public class StartInformation : MonoBehaviour
 
                 portal.accessableWorldNames.Add(world);
             }
-
             portalIndex++;
             portal.manager = portalManager;
             portal.gameObject.name = name;
         }
         portalManager.UpdatePortalsList();
-        //portalManager.UpdateLoadedWorlds();
+        portalManager.UpdateLoadedWorlds();
     }
 }

@@ -3,56 +3,56 @@
 public class EntityRayManager : MonoBehaviour
 {
     #region Variables
-    [Header("RayManager")]  public  LayerMask          collisionMask; //Things to collide with
-                            public  LayerMask          detectionMask; //Things to hit, but not collide
+    [Header("RayManager")]  public  LayerMask          collisionMask; // Things to collide with
+                            public  LayerMask          detectionMask; // Things to hit, but not collide
                             public  PortalController   ptlController;
                             public  PortalController[] visiblePortals;
 
-    [SerializeField, Space] protected float raySpacing   = 0.2f;   //Maximum distance between rays
-    [SerializeField]        protected float skinBuffer   = 0.015f; //Distance the rays are inset into the entity
+    [SerializeField, Space] protected float raySpacing   = 0.2f;   // Maximum distance between rays
+    [SerializeField]        protected float skinBuffer   = 0.015f; // Distance the rays are inset into the entity
 
-    [SerializeField, Space] protected float entityHeight = 1.0f; //Entity height in meters -- independent of entity's scale
-    [SerializeField]        protected float entityWidth  = 1.0f; //Entity width  in meters -- independent of entity's scale
-    [SerializeField]        protected float collisionRotationOffset = 0.0f; //Can be used to compensate for entity's rotation
+    [SerializeField, Space] protected float entityHeight = 1.0f;            // Entity height in meters -- independent of entity's scale
+    [SerializeField]        protected float entityWidth  = 1.0f;            // Entity width  in meters -- independent of entity's scale
+    [SerializeField]        protected float collisionRotationOffset = 0.0f; // Can be used to compensate for entity's rotation
 
-    protected int          capRayCount;    //Number of rays on the entity's top/bottom sides
-    protected float        capRaySpacing;  //Distance between rays on the entity's top/bottom sides
-    protected int          sideRayCount;   //Number of rays on the entity's left/right sides
-    protected float        sideRaySpacing; //Distance between rays on the entity's left/right sides
-    protected originPoints rayOrigins;     //World locations for each corner of the entity
-
-    protected Quaternion collisionRotation;
+    protected int          capRayCount;       // Number of rays on the entity's top/bottom sides
+    protected float        capRaySpacing;     // Distance between rays on the entity's top/bottom sides
+    protected int          sideRayCount;      // Number of rays on the entity's left/right sides
+    protected float        sideRaySpacing;    // Distance between rays on the entity's left/right sides
+    protected originPoints rayOrigins;        // World locations for each corner of the entity
+    protected Quaternion   collisionRotation; // 
 
     [SerializeField] public CollisionInformation cinfo;
 
     [System.Serializable]
     public struct CollisionInformation
     {
-        public bool below, above;               //Is entity touching a wall above/below of itself (ceiling / floor)
-        public bool left, right;                //Is entity touching a wall left/right of itself
-        public bool edgeLeft, edgeRight;        //Is entity at an edge on its left/right side
-        public bool falling, throughPlatform;   //Is entity in mid-air? -- Does entity fall through "Permeable" platforms?
-        public bool crouching;                  //Is the entity crouching? -- Affects jumping
-        public int worldIndex;                  //Loaded world index the entity is in
-        public int facingDirection;             //Direction of entity's "forward" -- -1 faces left, 1 faces right
+        public bool below   , above;           // Is entity touching a wall above/below of itself (ceiling / floor)
+        public bool left    , right;           // Is entity touching a wall left/right of itself
+        public bool edgeLeft, edgeRight;       // Is entity at an edge on its left/right side
+        public bool falling , throughPlatform; // Is entity in mid-air? -- Does entity fall through "Permeable" platforms?
+        public bool crouching;                 // Is the entity crouching? -- Affects jumping
+        public int  worldIndex;                // Loaded world index the entity is in
+        public int  facingDirection;           // Direction of entity's "forward" -- -1 faces left, 1 faces right
 
         public void Reset()
         {
-            above = below = false;
-            left = right = false;
+            above    = below     = false;
+            left     = right     = false;
             edgeLeft = edgeRight = false;
         }
     }
 
-    public struct originPoints
+    protected struct originPoints
     {
         public Vector2 topLeft   , topRight;
         public Vector2 bottomLeft, bottomRight;
     }
 
+    /// 
     public delegate bool SwappablePortalTests(GameObject _portal, int _index);
     public SwappablePortalTests AdditionalPortalTest;
-    public EntityRayManager() { AdditionalPortalTest = (GameObject p, int i) => { return true; }; }
+    public EntityRayManager() { AdditionalPortalTest = (GameObject p, int i) => { return true; }; } // Allows expansion without direct modification.
 
     public bool DEBUG_showDraws;
 
@@ -81,7 +81,7 @@ public class EntityRayManager : MonoBehaviour
                 if ((p.transform.position - this.transform.position).magnitude < tmpDistance)
                 {
                     PortalController pc = p.GetComponent<PortalController>();
-                    if (pc && pc.GetNextIndex(cinfo.worldIndex, false) != cinfo.worldIndex)
+                    if (pc && pc.accessableWorldIndices.Contains(cinfo.worldIndex) && pc.GetNextIndex(cinfo.worldIndex, false) != cinfo.worldIndex)
                     {
                         tmpDistance = (p.transform.position - this.transform.position).magnitude;
                         tempNearestPortal = pc;

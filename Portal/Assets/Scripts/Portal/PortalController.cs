@@ -7,19 +7,20 @@ public class PortalController : MonoBehaviour
     public PortalsManager manager;
 
 
-    public List<string> accessableWorldNames;                       // List of the names         of worlds this portal can get to
-    public List<int>    accessableWorldIndices = new List<int>();   // List of the world indices of worlds this portal can get to
+    public List<string> accessableWorldNames;                     // List of the names         of worlds this portal can get to
+    public List<int>    accessableWorldIndices = new List<int>(); // List of the world indices of worlds this portal can get to
 
     [Space(10)]
-    public float worldLoadDistance   = 15f  ;   // Distance at which this portal loads/unloads its scene(s)
-    public float worldSwitchDistance = 0.85f;   // Distance at which an entity can pass through into another scene
+    public float worldLoadDistance   = 15f  ; // Distance at which this portal loads/unloads its scene(s)
+    public float worldSwitchDistance = 0.85f; // Distance at which an entity can pass through into another scene
     public float portalHalfHeight    = 1f   ;
 
     [Space(10)]
-    public Camera               viewCam;                // Camera that sees into this portal's next world
-    public CameraSettingsEditor viewCamSettingsEditor;  // Controls this viewCam's settings
-    public RenderTexture        viewTexture;            // Texture the ViewCam renders to
-    public ViewQuadManipulator  viewQuad;               // Edits the view mesh based on player location
+    public List<Camera>         viewCams;              // All cameras that this portal can see?
+    public Camera               viewCam;               // Camera that sees into this portal's next world
+    public CameraSettingsEditor viewCamSettingsEditor; // Controls this viewCam's settings
+    public RenderTexture        viewTexture;           // Texture the ViewCam renders to
+    public ViewQuadManipulator  viewQuad;              // Edits the view mesh based on player location
 
 
     private void Start()

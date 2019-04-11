@@ -1,17 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class pl_CameraController : CameraSettingsEditor
 {
+#region Variables
     [Space, Header("Controller:")]
-    public PlayerController player;
-    public Material         viewMaterial; //Material on the view mesh that displays the portal's next world
+    public PlayerController player;                // Player's entity controller
+    public float            smoothingTime = 0.25f; // Time it takes for the camera to re-center itself
 
-    List<PortalController> visiblePortals = new List<PortalController>();
+    private List<PortalController> visiblePortals = new List<PortalController>();
+    private Vector2 smoothingVelocity             = Vector2.zero;
+    private Vector2 screenTopRight, screenBottomLeft;
 
-    public float smoothingTime = 0.25f; //Time it takes for the camera to re-center itself
-    Vector2 screenTopRight, screenBottomLeft, smoothingVelocity = Vector2.zero;
+#endregion Variables
 
     public void Start()
     {
@@ -22,29 +25,27 @@ public class pl_CameraController : CameraSettingsEditor
 
         player.AdditionalPortalTest = DetermineIsPortalVisible;
         player.SetNearestPortal();
+
         UpdateSettings(player.cinfo.worldIndex);
     }
 
     private void FixedUpdate()
     {
-        HandleMovement();
+        this.transform.position = HandleMovement();
 
         foreach (PortalController pc in visiblePortals)
         {
-            pc.viewQuad.UpdateView(this.transform.position, player.transform.position, player.cinfo.worldIndex);
-            pc.viewCamSettingsEditor.FindWorldCameraSettings(pc.GetWorldNameFromNextIndex(player.cinfo.worldIndex, player.reversePortalCycle));
+            if (pc.accessableWorldIndices.Contains(player.cinfo.worldIndex))
+            {
+                pc.viewQuad.UpdateView(this.transform.position, player.transform.position, player.cinfo.worldIndex);
+                pc.viewCamSettingsEditor.FindWorldCameraSettings(pc.GetWorldNameFromNextIndex(player.cinfo.worldIndex, player.reversePortalCycle));
+            }
         }
     }
 
-    void HandleMovement()
+    private Vector3 HandleMovement()
     {
-        this.transform.position = SmoothFollowSnapZ(smoothingTime);
-        //this.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 1);
-    }
-
-    Vector3 SmoothFollowSnapZ(float _smoothTime) // Smooths X and Y movement, snaps to Z positions (World switching)
-    {
-        Vector3 end = Vector2.SmoothDamp(this.transform.position, player.transform.position, ref smoothingVelocity, _smoothTime);
+        Vector3 end = Vector2.SmoothDamp(this.transform.position, player.transform.position, ref smoothingVelocity, smoothingTime);
         end.z = player.transform.position.z - 1;
         return end;
     }
@@ -55,13 +56,13 @@ public class pl_CameraController : CameraSettingsEditor
         base.FindWorldCameraSettings(name);
     }
 
-    bool DetermineIsPortalVisible(GameObject p, int index)
+    private bool DetermineIsPortalVisible(GameObject p, int index)
     {
         if (index == 0)
         {
             visiblePortals.Clear();
 
-            screenTopRight   = base.cam.ScreenToWorldPoint(new Vector2(base.cam.pixelWidth, base.cam.pixelHeight));
+            screenTopRight = base.cam.ScreenToWorldPoint(new Vector2(base.cam.pixelWidth, base.cam.pixelHeight));
             screenBottomLeft = base.cam.ScreenToWorldPoint(Vector2.zero);
         }
 
@@ -89,8 +90,7 @@ public class pl_CameraController : CameraSettingsEditor
 
                 pc.viewQuad = go.AddComponent<ViewQuadManipulator>();
                 pc.viewQuad.ptlController = pc;
-                pc.viewQuad.Initialize(viewMaterial);
-                //pc.viewQuad.viewAnchor = this.transform;
+                pc.viewQuad.Initialize();
 
                 go.AddComponent<CameraSettingsEditor>().cam = pc.viewCam;
                 pc.viewCamSettingsEditor = go.GetComponent<CameraSettingsEditor>();
@@ -108,12 +108,5 @@ public class pl_CameraController : CameraSettingsEditor
         }
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    //Gizmos.color = Color.blue;                  // Show world position of the screen's top    right
-    //    //Gizmos.DrawSphere(screenTopRight, 0.25f);   // Show world position of the screen's top    right
-    //    //Gizmos.color = Color.cyan;                  // Show world position of the screen's bottom left
-    //    //Gizmos.DrawSphere(screenBottomLeft, 0.25f); // Show world position of the screen's bottom left
-    //}
 
 }

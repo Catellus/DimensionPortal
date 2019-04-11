@@ -41,12 +41,9 @@ public class PortalsManager : MonoBehaviour
         worldLoadRequests.Add("PlayerAndPortal");   // Ensures that "PlayerAndPortal" is accounted for and does not get overridden/deleted
 
         foreach (var p in loadedPortals)
-        {
             foreach (string s in p.accessableWorldNames)
-            {
-                worldLoadRequests.Add(s);       // For each loaded portal, add the names of its requested worlds
-            }
-        }
+                if (!worldLoadRequests.Contains(s))
+                    worldLoadRequests.Add(s);       // For each loaded portal, add the names of its requested worlds
 
         loadedWorlds.Clear();
 
